@@ -1,0 +1,10 @@
+<sqls>
+	<sql id="select">
+	SELECT　* FROM USER WHERE ID = ${id} AND NAME = ${name} ;  
+	 
+	</sql>  
+	
+	<sql id="delete">
+	DELETE * FROM TABLE WHERE ID = '23j2345j3lk4lkjlk'
+	</sql>
+</sqls>

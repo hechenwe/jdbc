@@ -1,0 +1,11 @@
+<sqls>
+	<sql id="getTeacher">
+	SELE CLAZZ_ID  　* 
+	FROM TABLE WHERE CLAZZ_ID
+	 = ${clazzId} AND NAME = ${name};
+	clazzId
+	</sql>
+	<sql id="delete">
+	DELETE * FROM TABLE WHERE ID = '23j2345j3lk4lkjlk'
+	</sql>
+</sqls>
