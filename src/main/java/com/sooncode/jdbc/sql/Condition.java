@@ -14,6 +14,10 @@ public class Condition {
 	 * 条件对应的值
 	 */
 	private Object val;
+	/**
+	 *  条件对应的值(数组)
+	 */
+	private Object [] vales;
 	
 	/**
 	 * 条件使用的符号
@@ -22,12 +26,12 @@ public class Condition {
 
 	
 	/**
-	 *类型  
+	 *类型:"1"表示预定义条件查询;"0" 表示自定义条件查询。
 	 */
 	private String type ="1";  //"0" 表示自定义 
 	
 	/**
-	 * 条件字符串(SQL片段)
+	 * 条件字符串(SQL片段)--- 自定义设置条件时使用。
 	 */
 	private String condition ;
 	
@@ -65,6 +69,12 @@ public class Condition {
 		this.val = val;
 		this.conditionSign = conditionSign;
 	}
+	public Condition(String key, Object[] vales, String conditionSign) {
+		super();
+		this.key = key;
+		this.vales = vales;
+		this.conditionSign = conditionSign;
+	}
 
 	public String getType() {
 		return type;
@@ -80,6 +90,14 @@ public class Condition {
 
 	public void setCondition(String condition) {
 		this.condition = condition;
+	}
+
+	public Object[] getVales() {
+		return vales;
+	}
+
+	public void setVales(Object[] vales) {
+		this.vales = vales;
 	}
 	
 	

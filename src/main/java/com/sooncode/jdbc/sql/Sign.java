@@ -25,6 +25,9 @@ public enum Sign {
 	
 	/**不等于*/
     NOT_EQ,
+    
+    /**IN*/
+    IN,
 	/**模糊匹配('%xxx%')*/
 	LIKE;
 
@@ -37,6 +40,7 @@ public enum Sign {
 		Signmap.put("LT", "<");
 		Signmap.put("LTEQ", "<=");
 		Signmap.put("NOT_EQ", "<>");
+		Signmap.put("IN", "IN");
 	}
 
 }

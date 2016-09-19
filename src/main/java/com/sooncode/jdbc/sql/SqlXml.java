@@ -40,7 +40,7 @@ public class SqlXml {
 	 * @param str
 	 * @return 压缩后的字符串
 	 */
-	private String compressString(String str) {
+	private static String compressString(String str) {
 		String temp = "";
 		if (str != null) {
 			Pattern p = Pattern.compile("\t|\r|\n");
@@ -71,6 +71,24 @@ public class SqlXml {
 		}else{
 			Parameter p = new Parameter();
 			p.setReadySql(sql);
+			return p;
+		}
+	}
+	
+	/**
+	 * 获取可执行SQL语句
+	 * @param readySql 预编译SQL
+	 * @param obs 参数载体(注入sql中的对象集 (可选) 或者一个Map对象)
+	 * @return 参数模型 
+	 */
+	public static Parameter getSql2(String readySql,Object...obs) {
+		if(obs.length>0){
+			Parameter p = Para.getParameter(readySql, obs);
+			p.setReadySql(compressString(p.getReadySql()));
+			return 	p;		
+		}else{
+			Parameter p = new Parameter();
+			p.setReadySql(readySql);
 			return p;
 		}
 	}
