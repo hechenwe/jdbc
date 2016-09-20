@@ -14,6 +14,7 @@ import org.apache.log4j.Logger;
 import com.sooncode.jdbc.reflect.Genericity;
 import com.sooncode.jdbc.reflect.RObject;
 import com.sooncode.jdbc.sql.ComSQL;
+import com.sooncode.jdbc.sql.Cond;
 import com.sooncode.jdbc.sql.Conditions;
 import com.sooncode.jdbc.sql.Parameter;
 import com.sooncode.jdbc.util.Pager;
@@ -81,6 +82,20 @@ public class JdbcDao {
 		String columns = ComSQL.columns(obj);
 		Parameter p = con.getWhereSql();
 		String sql = "SELECT " + columns + " FROM " + tableName + " WHERE 1=1 " + p.getReadySql();
+		p.setReadySql(sql);
+		List<Map<String, Object>> list = jdbc.executeQueryL(p);
+		List<?> objects = findObject(list, obj.getClass());
+		return objects;
+	}
+	
+	
+	public List<?> gets(Class<?> entityClass,Cond con) {
+		RObject rObj = new RObject(entityClass);
+		Object obj = rObj.getObject();
+		String tableName = T2E.toColumn(obj.getClass().getSimpleName());
+		String columns = ComSQL.columns(obj);
+		Parameter p = con.getParameter();
+		String sql = "SELECT " + columns + " FROM " + tableName + " WHERE " + p.getReadySql();
 		p.setReadySql(sql);
 		List<Map<String, Object>> list = jdbc.executeQueryL(p);
 		List<?> objects = findObject(list, obj.getClass());

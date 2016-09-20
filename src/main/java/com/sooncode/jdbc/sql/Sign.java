@@ -17,13 +17,13 @@ public enum Sign {
 	/**大于等于 (>=)*/
 	GTEQ,
 
-	/** 小于(<) */
+	/** 小于 (<) */
 	LT,
 
-	/** 小于等于(<=) */
+	/** 小于等于 (<=) */
 	LTEQ,
 	
-	/**不等于*/
+	/**不等于 (<>)*/
     NOT_EQ,
     
     /**IN*/
@@ -41,6 +41,11 @@ public enum Sign {
 		Signmap.put("LTEQ", "<=");
 		Signmap.put("NOT_EQ", "<>");
 		Signmap.put("IN", "IN");
+	}
+	
+	public String getSign(){
+		String key = this.name();
+		return Signmap.get(key);
 	}
 
 }

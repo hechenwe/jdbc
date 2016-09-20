@@ -207,8 +207,8 @@ public class Conditions {
 					String newSign = Sign.Signmap.get(sign);
 					newSign = newSign == null ? " = " : newSign; //如果字段不为空，但是没有条件符号，默认使用等值查询"="。
 					if (newSign.equals("LIKE")) {
-						sql = sql + " AND " + con + " LIKE '%?%'";// + c.getVal() + "%'";
-						para.put(index,c.getVal());
+						sql = sql + " AND " + con + " LIKE ?";// + c.getVal() + "%'";
+						para.put(index,"%"+c.getVal()+"%");
 						index++;
 					} else if(sign!=null && sign.equals("IN")){
 						

@@ -1,26 +1,37 @@
 package com.sooncode.jdbc.sql;
 
-public class Or extends Cond {
+import java.util.HashMap;
+import java.util.Map;
 
+public class Or extends Cond {
+	 
 	public Or(Cond A,Cond B){
-		super("( "+A.expression + " OR "+B.expression +" )");
+		super();
+		Parameter a = A.parameter;  
+		Parameter b = B.parameter; 
+        
+		Parameter p = new Parameter();
+		
+		String sql ="( "+ a.getReadySql() + " OR " + b.getReadySql()+ " )";
+		p.setReadySql(sql);
+		
+		Map<Integer,Object> param = new HashMap<>();
+		param.putAll(a.getParams()); 
+		
+		for (int i =1;i <= b.getParams().size();i++) {
+			 Object value = b.getParams().get(i);
+			 param.put(param.size()+1, value);
+		}
+		p.setParams(param);
+		this.parameter = p;
 	}
 	
-	public static void main(String[] args) {
-		
-		Cond c1 = new Cond("1=1");
-		Cond c2 = new Cond("A=20");
-		Cond c3 = new Cond("C=5");
-		Cond c4 = new Cond("D>7");
-		Cond c5 = new Cond("E <= 127");
-		Cond c6 = new Cond("F <> 127");
-		
-		And a1 = new And(c1, c2).and(c6);
-		
-		Or o1 = new Or(c3, c4);
-		
-		And and = new And(a1, o1).and(c5);
-		
-		System.out.println("---"+ and.expression);
+	public Or or(Cond A){
+		return new Or(this,A);
 	}
+	public And and(Cond A){
+		return new And(this,A);
+	}
+	
+ 
 }

@@ -8,8 +8,10 @@ import org.apache.log4j.Logger;
 import org.junit.Test;
 
 import com.sooncode.jdbc.JdbcDao;
- 
+import com.sooncode.jdbc.sql.And;
+import com.sooncode.jdbc.sql.Cond;
 import com.sooncode.jdbc.sql.Conditions;
+import com.sooncode.jdbc.sql.Or;
 import com.sooncode.jdbc.sql.Sign;
 import com.sooncode.jdbc.util.Pager;
 import com.sooncode.usejdbc.entity.User;
@@ -36,6 +38,31 @@ public class JdbcDao_Test {
 		logger.info(list);
 		
 	}
+	
+	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void gets2(){
+		 
+		Cond name = new Cond("name", Sign.LIKE, "AA");
+		Cond id = new Cond("id", Sign.IN, new Integer[]{1079,1080,1081});
+		Cond age = new Cond("age",Sign.GT,3);
+		Cond pass = new  Cond("pass",Sign.LIKE,"h");
+		
+		And nameANDid = new And(name,id);
+		Or ageORpass = new Or(age,pass);
+		
+		Cond o = new And(nameANDid,ageORpass);
+		
+		Cond o2 = new And(name,id).and(new Or(age,pass));
+		
+		
+		Cond o3 = new And(new And(name,id),new Or(age,pass)); 
+		
+		List<User> list  =   (List<User>) jdbcDao.gets(User.class, o3 );
+		logger.info(list);
+	}
+	
 	@Test
 	public void gets4Conditions(){
 		
