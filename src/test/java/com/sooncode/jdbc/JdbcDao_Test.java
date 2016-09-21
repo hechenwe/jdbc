@@ -8,11 +8,14 @@ import org.apache.log4j.Logger;
 import org.junit.Test;
 
 import com.sooncode.jdbc.JdbcDao;
-import com.sooncode.jdbc.sql.And;
-import com.sooncode.jdbc.sql.Cond;
-import com.sooncode.jdbc.sql.Conditions;
-import com.sooncode.jdbc.sql.Or;
-import com.sooncode.jdbc.sql.Sign;
+import com.sooncode.jdbc.sql.condition.And;
+import com.sooncode.jdbc.sql.condition.Cond;
+import com.sooncode.jdbc.sql.condition.Conditions;
+import com.sooncode.jdbc.sql.condition.Or;
+import com.sooncode.jdbc.sql.condition.sign.CommonSign;
+import com.sooncode.jdbc.sql.condition.sign.DateFormatSign;
+import com.sooncode.jdbc.sql.condition.sign.LikeSign;
+import com.sooncode.jdbc.sql.condition.sign.Sign;
 import com.sooncode.jdbc.util.Pager;
 import com.sooncode.usejdbc.entity.User;
  
@@ -44,10 +47,10 @@ public class JdbcDao_Test {
 	@Test
 	public void gets2(){
 		 
-		Cond name = new Cond("name", Sign.LIKE, "AA");
-		Cond id = new Cond("id", Sign.IN, new Integer[]{1079,1080,1081});
-		Cond age = new Cond("age",Sign.GT,3);
-		Cond pass = new  Cond("pass",Sign.LIKE,"h");
+		Cond name = new Cond("name", LikeSign.LIKE, "AA");
+		Cond id = new Cond("id", CommonSign.IN, new Integer[]{1079,1080,1081});
+		Cond age = new Cond("age",CommonSign.GT,3);
+		Cond pass = new  Cond("pass",LikeSign.LIKE,"h");
 		
 		And nameANDid = new And(name,id);
 		Or ageORpass = new Or(age,pass);
@@ -59,7 +62,11 @@ public class JdbcDao_Test {
 		
 		Cond o3 = new And(new And(name,id),new Or(age,pass)); 
 		
-		List<User> list  =   (List<User>) jdbcDao.gets(User.class, o3 );
+		Cond a = new And(name,id,age,pass);
+		
+		Cond o4 = new Or(name,id,age,pass).and(new Cond("note", LikeSign.LIKE, "haha"));
+		
+		List<User> list  =   (List<User>) jdbcDao.gets(User.class, o4 );
 		logger.info(list);
 	}
 	
@@ -69,7 +76,7 @@ public class JdbcDao_Test {
 		User u = new  User();
 		u.setName("AAA");
 		Conditions c = new Conditions(u);
-		c.setCondition("name", Sign.LIKE);
+		c.setCondition("name", LikeSign.LIKE);
 		@SuppressWarnings("unchecked")
 		List<User> list  =   (List<User>) jdbcDao.gets(u);
 		logger.info(list);
@@ -122,6 +129,38 @@ public class JdbcDao_Test {
 		User u1 = new  User();
 		u1.setName("AAA");
 		Pager<?> p = jdbcDao.getPager(pagerNumber, pagerSize, u1);
+		
+		logger.info(p);
+		
+		
+	}
+	@Test
+	public void getPager2(){
+		Long pagerNumber = 1L;
+		Long pagerSize = 10L;
+		Cond name = new Cond("name", LikeSign.R_LIKE, "AA");
+		Cond id = new Cond("id", CommonSign.IN, new Integer[]{1079,1080,1081});
+		Cond age = new Cond("age",CommonSign.GT,3);
+		Cond pass = new  Cond("pass",LikeSign.LIKE,"h");
+		
+		And nameANDid = new And(name,id);
+		Or ageORpass = new Or(age,pass);
+		
+		Cond o = new And(nameANDid,ageORpass);
+		
+		Cond o2 = new And(name,id).and(new Or(age,pass));
+		
+		
+		Cond o3 = new And(new And(name,id),new Or(age,pass)); 
+		
+		Cond a = new And(name,id,age,pass);
+		
+		Cond o4 = new Or(name,id,age,pass).and(new Cond("note", LikeSign.LIKE, "haha"));
+		
+		Cond creatDate = new Cond("createDate",DateFormatSign.yyyy_MM,"2016-09");
+		Cond creatDate2 = new Cond("createDate",new DateFormatSign("%Y-%d"),"2016-25");
+		
+		Pager<?> p = jdbcDao.getPager(pagerNumber, pagerSize,User.class, creatDate2);
 		
 		logger.info(p);
 		

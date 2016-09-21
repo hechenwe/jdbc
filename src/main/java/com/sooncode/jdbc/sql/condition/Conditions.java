@@ -1,4 +1,4 @@
-package com.sooncode.jdbc.sql;
+package com.sooncode.jdbc.sql.condition;
 
 import java.util.HashMap;
 
@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.sooncode.jdbc.reflect.RObject;
+import com.sooncode.jdbc.sql.Parameter;
+import com.sooncode.jdbc.sql.condition.sign.Sign;
 import com.sooncode.jdbc.util.T2E;
 
 /**
@@ -55,7 +57,7 @@ public class Conditions {
 
 		Condition c = ces.get(key);
 		if (c != null) {
-			c.setConditionSign(sign.name());
+			c.setConditionSign(sign+"");
 			ces.put(c.getKey(), c);
 		}
 		return this;
@@ -78,7 +80,7 @@ public class Conditions {
 			if (obj != null) {
 				c.setVal(obj);
 			}
-			c.setConditionSign(sign.name());
+			c.setConditionSign(sign+"");
 			ces.put(c.getKey(), c);
 		}
 		return this;
@@ -204,7 +206,7 @@ public class Conditions {
 			if(c.getType().equals("1")){
 				if (c.getVal() != null || c.getVales()!=null) {
 					String sign = c.getConditionSign();
-					String newSign = Sign.Signmap.get(sign);
+					String newSign = sign ;//Sign.Signmap.get(sign);
 					newSign = newSign == null ? " = " : newSign; //如果字段不为空，但是没有条件符号，默认使用等值查询"="。
 					if (newSign.equals("LIKE")) {
 						sql = sql + " AND " + con + " LIKE ?";// + c.getVal() + "%'";

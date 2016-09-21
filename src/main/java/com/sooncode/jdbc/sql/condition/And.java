@@ -1,7 +1,9 @@
-package com.sooncode.jdbc.sql;
+package com.sooncode.jdbc.sql.condition;
  
 import java.util.HashMap;
 import java.util.Map;
+
+import com.sooncode.jdbc.sql.Parameter;
  
 
 public class And extends Cond{
@@ -36,42 +38,31 @@ public class And extends Cond{
 			String sql = new String ();//   "( "+ a.getReadySql() + " AND " + b.getReadySql()+" )";
 			Map<Integer,Object> param = new HashMap<>();
 			Parameter p = new Parameter();
-			  
+			sql= sql + "( ";
+			int n = 1;
 			for (Cond c : conds) {
 				Parameter cParam = c.parameter;
-				
-				
-				p.setReadySql(sql);
+				if(n==1){
+					sql = sql + " " + cParam.getReadySql();
+					
+				}else{
+					sql = sql + " AND " + cParam.getReadySql();
+				}
+				n++;
 				for (int i =1;i <= cParam.getParams().size();i++) {
 					Object value = cParam.getParams().get(i);
 					param.put(param.size()+1, value);
 				}
-				p.setParams(param);
-				this.parameter = p;
 			}
-		}else{
-			
-		}
-		
-		
-		
-		
+			sql = sql + " )";
+			p.setReadySql(sql);
+			p.setParams(param);
+			this.parameter = p;
+		} 
+		 
 		
 	}
 	
-	public And and(Cond A){
-		return new And(this,A);
-	}
-	public And and(Cond A,Cond B){
-		return new And(A,B);
-	}
 	
-	
-	public Or or(Cond A){
-		return new Or(this,A);
-	}
-	public Or or(Cond A,Cond B){
-		return new Or(A,B);
-	}
 	
 }

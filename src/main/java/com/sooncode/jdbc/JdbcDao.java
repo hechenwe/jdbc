@@ -14,9 +14,9 @@ import org.apache.log4j.Logger;
 import com.sooncode.jdbc.reflect.Genericity;
 import com.sooncode.jdbc.reflect.RObject;
 import com.sooncode.jdbc.sql.ComSQL;
-import com.sooncode.jdbc.sql.Cond;
-import com.sooncode.jdbc.sql.Conditions;
 import com.sooncode.jdbc.sql.Parameter;
+import com.sooncode.jdbc.sql.condition.Cond;
+import com.sooncode.jdbc.sql.condition.Conditions;
 import com.sooncode.jdbc.util.Pager;
 import com.sooncode.jdbc.util.T2E;
 
@@ -89,12 +89,12 @@ public class JdbcDao {
 	}
 	
 	
-	public List<?> gets(Class<?> entityClass,Cond con) {
+	public List<?> gets(Class<?> entityClass,Cond cond) {
 		RObject rObj = new RObject(entityClass);
 		Object obj = rObj.getObject();
 		String tableName = T2E.toColumn(obj.getClass().getSimpleName());
 		String columns = ComSQL.columns(obj);
-		Parameter p = con.getParameter();
+		Parameter p = cond.getParameter();
 		String sql = "SELECT " + columns + " FROM " + tableName + " WHERE " + p.getReadySql();
 		p.setReadySql(sql);
 		List<Map<String, Object>> list = jdbc.executeQueryL(p);
@@ -195,6 +195,43 @@ public class JdbcDao {
 		List<Map<String, Object>> list = jdbc.executeQueryL(sqlP);
 		Long size = (Long) jdbc.executeQueryM(sizeP).get("size");
 		List<?> lists = findObject(list, conditions.getObj().getClass());
+		Pager<?> pager = new Pager<>(pageNum, pageSize, size, lists);
+		return pager;
+	}
+	/**
+	 * 分页查询 （单表查询）
+	 * @param pageNum 当前页
+	 * @param pageSize 每页数量
+	 * @param entityClass 实体类
+	 * @param cond 查询条件模型
+	 * @return 分页模型 ;参数异常时放回空模型
+	 */
+	public Pager<?> getPager(Long pageNum, Long pageSize,Class<?> entityClass, Cond cond) {
+		
+		if(pageNum ==null || pageSize == null || entityClass == null || cond == null || cond.isHaveCond()== false){
+			return null;
+		}
+		
+		RObject rObj = new RObject(entityClass);
+		String columns = ComSQL.columns(rObj.getObject());
+		Parameter where = cond.getParameter();
+		String tableName = T2E.toColumn(entityClass.getSimpleName());
+		Long index = (pageNum - 1) * pageSize;
+		String sql = "SELECT " + columns + " FROM " + tableName + " WHERE " + where.getReadySql() + " LIMIT " + index + "," + pageSize;
+		String sql4size = "SELECT COUNT(1) AS SIZE  FROM " + tableName + " WHERE " + where.getReadySql();
+		logger.debug("[可执行SQL] " + sql);
+		logger.debug("[可执行SQL] " + sql4size);
+		Parameter sqlP = new Parameter();
+		sqlP.setReadySql(sql);
+		sqlP.setParams(where.getParams());
+		
+		Parameter sizeP = new Parameter();
+		sizeP.setReadySql(sql4size);
+		sizeP.setParams(where.getParams());
+		
+		List<Map<String, Object>> list = jdbc.executeQueryL(sqlP);
+		Long size = (Long) jdbc.executeQueryM(sizeP).get("size");
+		List<?> lists = findObject(list, entityClass);
 		Pager<?> pager = new Pager<>(pageNum, pageSize, size, lists);
 		return pager;
 	}

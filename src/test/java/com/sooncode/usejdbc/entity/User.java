@@ -2,8 +2,8 @@ package com.sooncode.usejdbc.entity;
 
 import java.util.Date;
 
-import com.sooncode.jdbc.sql.Conditions;
-import com.sooncode.jdbc.sql.Sign;
+import com.sooncode.jdbc.sql.condition.Conditions;
+import com.sooncode.jdbc.sql.condition.sign.Sign;
 
 public class User {
 	private Integer id;
@@ -249,18 +249,5 @@ public class User {
 		return "{\"id\":\"" + id + "\",\"name\":\"" + name + "\",\"pass\":\"" + pass + "\",\"note\":\"" + note + "\",\"age\":\"" + age + "\",\"createDate\":\"" + createDate + "\",\"field1\":\"" + field1 + "\"}  ";
 	}
 
-	public static void main(String[] args) {
-		User u = new User();
-		u.setAge(12);
-		u.setId(1234);
-		u.setCreateDate(new Date());
-		u.setField10("xxxttt");
-
-		Conditions c = new Conditions(u);
-
-		c = c.setCondition("age", Sign.GT).setCondition("id", Sign.GTEQ).setCondition("createDate", Sign.LIKE);
-
-		System.out.println(c.getWhereSql());
-
-	}
+	 
 }
