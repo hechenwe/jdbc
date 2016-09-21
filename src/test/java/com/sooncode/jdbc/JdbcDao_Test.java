@@ -1,7 +1,7 @@
 package com.sooncode.jdbc;
 
 import java.util.ArrayList;
-import java.util.Date;
+
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -12,10 +12,12 @@ import com.sooncode.jdbc.sql.condition.And;
 import com.sooncode.jdbc.sql.condition.Cond;
 import com.sooncode.jdbc.sql.condition.Conditions;
 import com.sooncode.jdbc.sql.condition.Or;
+import com.sooncode.jdbc.sql.condition.OrderBy;
+import com.sooncode.jdbc.sql.condition.Sort;
 import com.sooncode.jdbc.sql.condition.sign.CommonSign;
 import com.sooncode.jdbc.sql.condition.sign.DateFormatSign;
 import com.sooncode.jdbc.sql.condition.sign.LikeSign;
-import com.sooncode.jdbc.sql.condition.sign.Sign;
+
 import com.sooncode.jdbc.util.Pager;
 import com.sooncode.usejdbc.entity.User;
  
@@ -158,7 +160,7 @@ public class JdbcDao_Test {
 		Cond o4 = new Or(name,id,age,pass).and(new Cond("note", LikeSign.LIKE, "haha"));
 		
 		Cond creatDate = new Cond("createDate",DateFormatSign.yyyy_MM,"2016-09");
-		Cond creatDate2 = new Cond("createDate",new DateFormatSign("%Y-%d"),"2016-25");
+		Cond creatDate2 = new Cond("createDate",new DateFormatSign("%Y-%d"),"2016-25").orderBy(new OrderBy("id", Sort.ASC),new OrderBy("name", Sort.DESC));
 		
 		Pager<?> p = jdbcDao.getPager(pagerNumber, pagerSize,User.class, creatDate2);
 		

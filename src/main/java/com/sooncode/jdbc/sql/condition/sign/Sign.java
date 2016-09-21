@@ -9,7 +9,7 @@ package com.sooncode.jdbc.sql.condition.sign;
  * @author pc
  *
  */
-public class Sign {
+public  class Sign {
     
 	 
 	private String signStr;
@@ -21,7 +21,7 @@ public class Sign {
 	public Sign(String signStr){
 		this.signStr= signStr;
 	}
-	public Sign(){
+	protected Sign(){
 		
 	}
 

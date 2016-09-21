@@ -10,11 +10,18 @@ import com.sooncode.jdbc.util.T2E;
 public class Cond {
 
 	protected Parameter parameter;
-
+     
 	protected Cond() {
 
 	}
-
+	
+	
+    /**
+     * 创建查询条件
+     * @param key 属性名称（对应数据库表的字段）
+     * @param sign 符号模型 ：</br> 包含：CommonSign 类 （常见符号）；LikeSign 类 （模糊查询符号）；DateFormatSign 类 （日期符号查询）。
+     * @param value 条件对应的值
+     */
 	public Cond(String key, Sign sign, Object value) {
 
 		String className = sign.getClass().getName();
@@ -29,7 +36,7 @@ public class Cond {
 			} else if (sign.equals("L_LIKE")) {
 				value = value + "%";
 			}
-		} else if ("com.sooncode.jdbc.sql.DateFormatSign".equals(className)) {
+		} else if ("com.sooncode.jdbc.sql.condition.sign.DateFormatSign".equals(className)) {
 			sql = " DATE_FORMAT(" + T2E.toColumn(key) + ",'" + sign + "') = ? ";
 
 		} else {
@@ -43,7 +50,12 @@ public class Cond {
 		this.parameter.setParams(param);
 
 	}
-
+	 /**
+     * 创建查询条件
+     * @param key 属性名称（对应数据库表的字段）
+     * @param sign 符号模型 ：</br> 包含：CommonSign 类 （常见符号）；LikeSign 类 （模糊查询符号）；DateFormatSign 类 （日期符号查询）。
+     * @param value 条件对应的值集合
+     */
 	public Cond(String key, Sign sign, Object[] values) {
 		String signStr = "" + sign;
 		if (signStr.equals("IN")) {
@@ -68,6 +80,8 @@ public class Cond {
 
 	}
 
+	 
+	
 	public And and(Cond A) {
 		return new And(this, A);
 	}
@@ -109,5 +123,25 @@ public class Cond {
 		} else {
 			return false;
 		}
+	}
+	/**
+	 * 排序
+	 * @param orderBies
+	 * @return
+	 */
+	public Cond orderBy(OrderBy ... orderBies){
+		
+		String orderBy = " ORDER BY ";
+		for (int i = 0; i < orderBies.length; i++) {
+			if(i==0){
+				orderBy = orderBy +" "+ orderBies[i];
+			}else{
+				orderBy = orderBy+" , " + orderBies[i];
+			}
+		}
+		
+		this.parameter.setReadySql(this.parameter.getReadySql()+ " " +orderBy);
+		return this;
+		
 	}
 }

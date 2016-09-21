@@ -76,7 +76,7 @@ public class JdbcDao {
 		return objects;
 	}
 
-	public List<?> gets(Conditions con) {
+	public List<?> gets(Conditions con ) {
 		Object obj = con.getObj();
 		String tableName = T2E.toColumn(obj.getClass().getSimpleName());
 		String columns = ComSQL.columns(obj);
