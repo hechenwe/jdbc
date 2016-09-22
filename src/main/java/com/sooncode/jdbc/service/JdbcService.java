@@ -1,6 +1,9 @@
-package com.sooncode.jdbc;
+package com.sooncode.jdbc.service;
 import java.util.List;
 import org.apache.log4j.Logger;
+
+import com.sooncode.jdbc.dao.JdbcDao;
+import com.sooncode.jdbc.dao.JdbcDaoFactory;
 import com.sooncode.jdbc.util.Pager;
 
 /**
@@ -18,12 +21,12 @@ public final class JdbcService {
 	 */
 	private JdbcDao jdbcDao;
 
-	public JdbcService() {
-		jdbcDao = new JdbcDao();
+	JdbcService() {//默认包类可访问
+		jdbcDao = JdbcDaoFactory.getJdbcDao();
 	}
 
-	public JdbcService(String dbKey) {
-		jdbcDao = new JdbcDao(dbKey);
+	JdbcService(String dbKey) { //默认包类可访问
+		jdbcDao = JdbcDaoFactory.getJdbcDao(dbKey);
 	}
 
 	/**

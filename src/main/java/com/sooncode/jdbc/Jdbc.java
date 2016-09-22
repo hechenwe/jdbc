@@ -55,14 +55,14 @@ public class Jdbc {
 	 * @param dbKey
 	 *            数据源关键码
 	 */
-	public Jdbc(String dbKey) {
+	Jdbc(String dbKey) {
 		this.dbKey = dbKey;
 
 	}
 
 	
 	
-	public Jdbc() {
+    Jdbc() {
 		// 默认使用default 数据库连接参数
 	}
 

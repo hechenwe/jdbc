@@ -7,7 +7,8 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Test;
 
-import com.sooncode.jdbc.JdbcDao;
+import com.sooncode.jdbc.dao.JdbcDao;
+import com.sooncode.jdbc.dao.JdbcDaoFactory;
 import com.sooncode.jdbc.sql.condition.And;
 import com.sooncode.jdbc.sql.condition.Cond;
 import com.sooncode.jdbc.sql.condition.Conditions;
@@ -23,7 +24,7 @@ import com.sooncode.usejdbc.entity.User;
  
 public class JdbcDao_Test {
     private static Logger logger = Logger.getLogger("JdbcDaoTest.class");
-	private JdbcDao jdbcDao = new JdbcDao();
+	private JdbcDao jdbcDao = JdbcDaoFactory.getJdbcDao();
 	@Test
 	public void get(){
 		

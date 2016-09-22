@@ -19,7 +19,7 @@ import com.sooncode.jdbc.util.Md5;
  * @author pc
  *
  */
-public class Cache{
+public class Cache2{
 	public final static Logger logger = Logger.getLogger("Cache.class");
 	
 	public final static int MAX_SIZE =100;

@@ -1,4 +1,4 @@
-package com.sooncode.jdbc;
+package com.sooncode.jdbc.dao;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
@@ -11,6 +11,8 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+import com.sooncode.jdbc.Jdbc;
+import com.sooncode.jdbc.JdbcFactory;
 import com.sooncode.jdbc.reflect.Genericity;
 import com.sooncode.jdbc.reflect.RObject;
 import com.sooncode.jdbc.sql.ComSQL;
@@ -35,12 +37,12 @@ public class JdbcDao {
 	 */
 	private Jdbc jdbc;
 
-	public JdbcDao() {
-		jdbc = new Jdbc();
+	JdbcDao() {
+		jdbc = JdbcFactory.getJdbc();
 	}
 
-	public JdbcDao(String dbKey) {
-		jdbc = new Jdbc(dbKey);
+	JdbcDao(String dbKey) {
+		jdbc = JdbcFactory.getJdbc(dbKey);
 	}
 
 	/**
