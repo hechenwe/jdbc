@@ -3,6 +3,7 @@ package com.sooncode.jdbc.sql;
 import org.apache.log4j.Logger;
 import org.junit.Test;
 
+import com.sooncode.jdbc.sql.xml.SqlXml;
 import com.sooncode.usejdbc.entity.User;
 
 import util.PathUtil;

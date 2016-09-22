@@ -16,7 +16,7 @@ import org.apache.log4j.Logger;
  * @author pc
  *
  */
-public class Para {
+public class ParaInject {
 
 	private static Logger logger = Logger.getLogger("Para.class");
 

@@ -1,13 +1,12 @@
 package com.sooncode.jdbc.sql;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-//import org.apache.log4j.Logger;
-
 import com.sooncode.jdbc.reflect.RObject;
+import com.sooncode.jdbc.sql.condition.Cond;
 import com.sooncode.jdbc.util.T2E;
- 
 
 /**
  * SQL工具类 注意: 对象的类名 与 数据库表名"一致"
@@ -17,18 +16,84 @@ import com.sooncode.jdbc.util.T2E;
  */
 public class SQL {
 
-	//private static Logger logger = Logger.getLogger("SQL.class");
-	/**
-	 * 可执行的SQL
-	 */
-	private String sqlString = "";
+	/** 预编译SQL */
+	private String readySql = "";
+
+	/** 参数 ，从1开始 */
+	private Map<Integer, Object> params = new HashMap<>();
 
 	public String toString() {
+		return this.readySql;
+	}
 
-		 this.sqlString = this.sqlString.replace("WHERE AND", "WHERE");
-		 this.sqlString = this.sqlString.replace("WHERE OR", "WHERE");
-		//logger.debug("【可执行SQL】: " + this.sqlString);
-		return this.sqlString;
+	public Parameter getParameter() {
+		Parameter p = new Parameter();
+		p.setReadySql(this.readySql);
+		p.setParams(params);
+		return p;
+	}
+
+	public SQL SELECT() {
+		this.readySql = "SELECT * ";
+		return this;
+	}
+
+	public SQL SELECT(String... keys) {
+		String k = "";
+		for (int i = 0; i < keys.length; i++) {
+			String key = T2E.toColumn(keys[i]);
+			if (i == 0) {
+				k = k + " " + key;
+			} else {
+				k = k + " , " + key;
+			}
+		}
+
+		this.readySql = "SELECT " + k;
+		return this;
+	}
+
+	public SQL SELECT(Class<?> clas) {
+
+		RObject rObject = new RObject(clas);
+		Map<String, Object> columns = rObject.getFiledAndValue();
+		int m = 0;
+		String c = "";
+		for (Entry<String, Object> entry : columns.entrySet()) {
+
+			if (m != 0) {
+				c = c + " , ";
+			}
+			c = c + T2E.toColumn(entry.getKey());
+			m++;
+		}
+		this.readySql = "SELECT " + c;
+		return this;
+	}
+
+	public SQL FROM(Class<?> clas) {
+
+		this.readySql = this.readySql + " FROM " + T2E.toColumn(clas.getSimpleName());
+		return this;
+	}
+
+	public SQL FROM(String entityName) {
+
+		this.readySql = this.readySql + " FROM " + T2E.toColumn(entityName);
+		return this;
+	}
+
+	public SQL WHERE() {
+
+		this.readySql = this.readySql + " WHERE ";
+		return this;
+	}
+
+	public SQL WHERE(Cond cond) {
+
+		this.readySql = this.readySql + " WHERE " + cond.getParameter().getReadySql();
+		this.params = cond.getParameter().getParams();
+		return this;
 	}
 
 	/**
@@ -40,71 +105,20 @@ public class SQL {
 	 */
 	public SQL PUT_KEY(String key) {
 
-		this.sqlString = this.sqlString + " " + key;
-		return this;
-	}
-
-	public SQL SELECT() {
-
-		this.sqlString = this.sqlString + "SELECT ";
-		return this;
-	}
-
-	public SQL FROM() {
-
-		this.sqlString = this.sqlString + " FROM ";
-		return this;
-	}
-
-	public SQL WHERE() {
-
-		this.sqlString = this.sqlString + " WHERE ";
+		this.readySql = this.readySql + " " + key;
 		return this;
 	}
 
 	public SQL AND() {
 
-		this.sqlString = this.sqlString + " AND ";
+		this.readySql = this.readySql + " AND ";
 		return this;
 	}
 
 	public SQL OR() {
 
-		this.sqlString = this.sqlString + " OR ";
+		this.readySql = this.readySql + " OR ";
 		return this;
-	}
-
-	public SQL TABLE(Class<?> clas) {
-
-		String tableName = T2E.toColumn(clas.getSimpleName());
-		this.sqlString = this.sqlString + " " + tableName;
-		return this;
-	}
-
-	/**
-	 * 获取实体类对应的字段
-	 * 
-	 * @param clas
-	 *            实体类的代理
-	 * @return 字段集 字段之间用 逗号分割
-	 */
-	public SQL COLUMNS(Class<?> clas) {
-		 
-		RObject rObject = new RObject(clas);
-		Map<String, Object> columns = rObject.getFiledAndValue();
-		int m = 0;
-		String c = "";
-		for (Entry<String, Object> entry : columns.entrySet()) {
-
-			if (m != 0) {
-				c = c + ",";
-			}
-			c = c + T2E.toColumn(entry.getKey());
-			m++;
-		}
-		this.sqlString = this.sqlString + c;
-		return this;
-
 	}
 
 	/**
@@ -116,7 +130,7 @@ public class SQL {
 	public SQL SUM(String fieldName) {
 		String column = T2E.toColumn(fieldName);
 		String str = "SUM(" + column + ") ";
-		this.sqlString = this.sqlString + str;
+		this.readySql = this.readySql + str;
 		return this;
 	}
 
@@ -129,7 +143,7 @@ public class SQL {
 	public SQL AVG(String fieldName) {
 		String column = T2E.toColumn(fieldName);
 		String str = "AVG(" + column + ") AS AVG" + column + " ";
-		this.sqlString = this.sqlString + str;
+		this.readySql = this.readySql + str;
 		return null;
 	}
 
@@ -142,7 +156,7 @@ public class SQL {
 	public SQL MAX(String fieldName) {
 		String column = T2E.toColumn(fieldName);
 		String str = "MAX(" + column + ") AS MAX" + column + " ";
-		this.sqlString = this.sqlString + str;
+		this.readySql = this.readySql + str;
 		return null;
 	}
 
@@ -155,7 +169,7 @@ public class SQL {
 	public SQL MIN(String fieldName) {
 		String column = T2E.toColumn(fieldName);
 		String str = "MIN(" + column + ") AS MIN" + column + " ";
-		this.sqlString = this.sqlString + str;
+		this.readySql = this.readySql + str;
 		return null;
 	}
 
@@ -170,8 +184,8 @@ public class SQL {
 		String sql = "";
 		if (value != null) {
 			sql = " " + T2E.toColumn(fieldName) + "='" + value + "'";
-		} 
-		this.sqlString = this.sqlString + sql;
+		}
+		this.readySql = this.readySql + sql;
 		return this;
 	}
 
@@ -187,7 +201,7 @@ public class SQL {
 		if (value != null) {
 			sql = " " + T2E.toColumn(fieldName) + ">'" + value + "'";
 		}
-		this.sqlString = this.sqlString + sql;
+		this.readySql = this.readySql + sql;
 		return this;
 	}
 
@@ -203,7 +217,7 @@ public class SQL {
 		if (value != null) {
 			sql = " " + T2E.toColumn(fieldName) + "<'" + value + "'";
 		}
-		this.sqlString = this.sqlString + sql;
+		this.readySql = this.readySql + sql;
 		return this;
 	}
 
@@ -219,7 +233,7 @@ public class SQL {
 		if (value != null) {
 			sql = " " + T2E.toColumn(fieldName) + ">='" + value + "'";
 		}
-		this.sqlString = this.sqlString + sql;
+		this.readySql = this.readySql + sql;
 		return this;
 	}
 
@@ -235,7 +249,7 @@ public class SQL {
 		if (value != null) {
 			sql = " " + T2E.toColumn(fieldName) + "<='" + value + "'";
 		}
-		this.sqlString = this.sqlString + sql;
+		this.readySql = this.readySql + sql;
 		return this;
 	}
 
@@ -256,7 +270,7 @@ public class SQL {
 			str = str + T2E.toColumn(f);
 			n++;
 		}
-		this.sqlString = this.sqlString + " ORDER BY " + str;
+		this.readySql = this.readySql + " ORDER BY " + str;
 		return this;
 	}
 
@@ -267,7 +281,7 @@ public class SQL {
 	 */
 	public SQL DESC() {
 		String str = " DESC ";
-		this.sqlString = this.sqlString + str;
+		this.readySql = this.readySql + str;
 		return this;
 	}
 
@@ -283,7 +297,7 @@ public class SQL {
 		if (value != null) {
 			sql = " AND " + T2E.toColumn(fieldName) + " LIKE '%" + value + "'";
 		}
-		this.sqlString = this.sqlString + sql;
+		this.readySql = this.readySql + sql;
 		return this;
 	}
 
@@ -299,7 +313,7 @@ public class SQL {
 		if (value != null) {
 			sql = " AND " + T2E.toColumn(fieldName) + " LIKE '" + value + "%'";
 		}
-		this.sqlString = this.sqlString + sql;
+		this.readySql = this.readySql + sql;
 		return this;
 	}
 
@@ -308,7 +322,7 @@ public class SQL {
 		if (value != null) {
 			sql = " " + T2E.toColumn(fieldName) + " LIKE '%" + value + "%'";
 		}
-		this.sqlString = this.sqlString + sql;
+		this.readySql = this.readySql + sql;
 		return this;
 	}
 
@@ -318,38 +332,47 @@ public class SQL {
 			sql = " AND " + T2E.toColumn(fieldName) + " BETWEEN '" + value1 + "' AND '" + value2 + "'";
 		}
 
-		this.sqlString = this.sqlString + sql;
+		this.readySql = this.readySql + sql;
 		return this;
 	}
 
-	
-	public SQL COUNT(String key){
-		this.sqlString = this.sqlString + "COUNT("+key+") ";
+	public SQL COUNT(String key) {
+		this.readySql = this.readySql + "COUNT(" + key + ") ";
 		return this;
 	}
-	public SQL AS(String key){
-		this.sqlString = this.sqlString + "AS "+T2E.toColumn(key)+" ";
+
+	public SQL AS(String key) {
+		this.readySql = this.readySql + "AS " + T2E.toColumn(key) + " ";
 		return this;
 	}
-	public SQL GROUP_BY(String key){
-		this.sqlString = this.sqlString + " GROUP BY "+T2E.toColumn(key)+" ";
+
+	public SQL GROUP_BY(String key) {
+		this.readySql = this.readySql + " GROUP BY " + T2E.toColumn(key) + " ";
 		return this;
 	}
-	public SQL DISTINCT(String key){
-		this.sqlString = this.sqlString + " DISTINCT "+T2E.toColumn(key)+" ";
+
+	public SQL DISTINCT(String key) {
+		this.readySql = this.readySql + " DISTINCT " + T2E.toColumn(key) + " ";
 		return this;
 	}
+
 	/**
-	 * mysql 时间函数 
-	 * @param key 属性
-	 * @param startDate 开始时间
-	 * @param endDate 结束时间
+	 * mysql 时间函数
+	 * 
+	 * @param key
+	 *            属性
+	 * @param startDate
+	 *            开始时间
+	 * @param endDate
+	 *            结束时间
 	 * @return
 	 */
-	public SQL DATE(String key,String startDate,String endDate){
-		this.sqlString = this.sqlString + " DATE("+T2E.toColumn(key)+")BETWEEN '"+startDate+"' AND '"+endDate+"'";
+	public SQL DATE(String key, String startDate, String endDate) {
+		this.readySql = this.readySql + " DATE(" + T2E.toColumn(key) + ")BETWEEN '" + startDate + "' AND '" + endDate
+				+ "'";
 		return this;
 	}
+
 	/**
 	 * 分页功能
 	 * 
@@ -362,20 +385,9 @@ public class SQL {
 	public SQL LIMIT(Long pageNumber, Long pageSize) {
 		Long index = (pageNumber - 1) * pageSize;
 		String sql = " LIMIT " + index + "," + pageSize;
-		this.sqlString = this.sqlString + sql;
+		this.readySql = this.readySql + sql;
 		return this;
 
-	}
-	
-	public static void main(String[] args) {
-//		SQL sql = new SQL();
-//		sql.SELECT().COLUMNS(Persion.class)
-//		.FROM().TABLE(Persion.class)
-//		.WHERE().EQ("id", "1")
-//		.AND().LIKE("name", "tome");
-//		
-//		System.out.println(sql.toString());
-	
 	}
 
 }

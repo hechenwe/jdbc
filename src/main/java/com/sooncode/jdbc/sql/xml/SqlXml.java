@@ -1,4 +1,4 @@
-package com.sooncode.jdbc.sql;
+package com.sooncode.jdbc.sql.xml;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -7,6 +7,9 @@ import java.io.IOException;
  
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import com.sooncode.jdbc.sql.ParaInject;
+import com.sooncode.jdbc.sql.Parameter;
 
 //import org.apache.log4j.Logger;
  
@@ -65,7 +68,7 @@ public class SqlXml {
 		ParaXml paraXml = new ParaXml(xml);
 		String sql = paraXml.getValue(id);
 		if(obs.length>0){
-			Parameter p = Para.getParameter(sql, obs);
+			Parameter p = ParaInject.getParameter(sql, obs);
 			p.setReadySql(compressString(p.getReadySql()));
 			return 	p;		
 		}else{
@@ -83,7 +86,7 @@ public class SqlXml {
 	 */
 	public static Parameter getSql2(String readySql,Object...obs) {
 		if(obs.length>0){
-			Parameter p = Para.getParameter(readySql, obs);
+			Parameter p = ParaInject.getParameter(readySql, obs);
 			p.setReadySql(compressString(p.getReadySql()));
 			return 	p;		
 		}else{
