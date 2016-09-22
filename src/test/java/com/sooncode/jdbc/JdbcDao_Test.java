@@ -15,7 +15,7 @@ import com.sooncode.jdbc.sql.condition.Conditions;
 import com.sooncode.jdbc.sql.condition.Or;
 import com.sooncode.jdbc.sql.condition.OrderBy;
 import com.sooncode.jdbc.sql.condition.Sort;
-import com.sooncode.jdbc.sql.condition.sign.CommonSign;
+import com.sooncode.jdbc.sql.condition.sign.EqualSign;
 import com.sooncode.jdbc.sql.condition.sign.DateFormatSign;
 import com.sooncode.jdbc.sql.condition.sign.LikeSign;
 import com.sooncode.jdbc.sql.condition.sign.NullSign;
@@ -51,8 +51,8 @@ public class JdbcDao_Test {
 	public void gets2(){
 		 
 		Cond name = new Cond("name", LikeSign.LIKE, "AA");
-		Cond id = new Cond("id", CommonSign.IN, new Integer[]{1079,1080,1081});
-		Cond age = new Cond("age",CommonSign.GT,3);
+		Cond id = new Cond("id", new Integer[]{1079,1080,1081});
+		Cond age = new Cond("age",EqualSign.GT,3);
 		Cond pass = new  Cond("pass",LikeSign.LIKE,"h");
 		
 		And nameANDid = new And(name,id);
@@ -142,8 +142,8 @@ public class JdbcDao_Test {
 		Long pagerNumber = 1L;
 		Long pagerSize = 10L;
 		Cond name = new Cond("name", LikeSign.R_LIKE, "AA");
-		Cond id = new Cond("id", CommonSign.IN, new Integer[]{1079,1080,1081});
-		Cond age = new Cond("age",CommonSign.GT,3);
+		Cond id = new Cond("id", new Integer[]{1079,1080,1081});
+		Cond age = new Cond("age",EqualSign.GT,3);
 		Cond pass = new  Cond("pass",LikeSign.LIKE,"h");
 		
 		And nameANDid = new And(name,id);
