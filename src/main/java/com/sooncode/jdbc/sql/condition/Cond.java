@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.sooncode.jdbc.sql.Parameter;
+import com.sooncode.jdbc.sql.condition.sign.NullSign;
 import com.sooncode.jdbc.sql.condition.sign.Sign;
 import com.sooncode.jdbc.util.T2E;
 
@@ -50,17 +51,14 @@ public class Cond {
 		this.parameter.setParams(param);
 
 	}
-	 /**
-     * 创建查询条件
+	 
+	/**
+     * 创建查询条件(IN)
      * @param key 属性名称（对应数据库表的字段）
-     * @param sign 符号模型 ：</br> 包含：CommonSign 类 （常见符号）；LikeSign 类 （模糊查询符号）；DateFormatSign 类 （日期符号查询）。
      * @param value 条件对应的值集合
      */
-	public Cond(String key, Sign sign, Object[] values) {
-		String signStr = "" + sign;
-		if (signStr.equals("IN")) {
+	public Cond(String key, Object[] values) {
 			String in = "( ";
-
 			Map<Integer, Object> param = new HashMap<>();
 			for (int i = 1; i <= values.length; i++) {
 				param.put(i, values[i - 1]);
@@ -75,9 +73,17 @@ public class Cond {
 			this.parameter = new Parameter();
 			this.parameter.setReadySql(sql);
 			this.parameter.setParams(param);
-
-		}
-
+	}
+	/**
+	 * 创建查询条件(NULL)
+	 * @param key 属性名称（对应数据库表的字段）
+	 * @param NullSign IS NULL 或者 IS NOT NULL
+	 */
+	public Cond(String key, Sign NullSign) {
+		    
+			String sql = T2E.toColumn(key) +" " +NullSign;
+			this.parameter = new Parameter();
+			this.parameter.setReadySql(sql);
 	}
 
 	 
