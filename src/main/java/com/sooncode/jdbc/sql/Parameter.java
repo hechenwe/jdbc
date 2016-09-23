@@ -63,7 +63,22 @@ public class Parameter {
 		}
 		return sql.toString();
 	}
-	
-	
+	/**
+	 * 参数模型是否异常
+	 * @return
+	 */
+	public boolean isException(){
+		
+		if(this.readySql == null || this.readySql.trim().equals("")){
+			return false;
+		}else{
+			
+			;//int parameterSize = this.readySql.
+			
+			return true;
+		}
+		
+		
+	}
 
 }

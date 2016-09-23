@@ -54,7 +54,9 @@ public class Jdbc {
 	 *            
 	 */
 	Jdbc(String dbKey) {
-		this.dbKey = dbKey;
+		if(dbKey!=null && !dbKey.trim().equals("")){
+			this.dbKey = dbKey;
+		}
 
 	}
 
@@ -81,6 +83,13 @@ public class Jdbc {
 	 * @return 一般情况是返回受影响的行数,当有主键为自增字段,在添加数据时返回 自增值。当执行出现异常时放回null.
 	 */
 	public Long executeUpdate(Parameter p) {
+		
+		 
+		
+		
+		
+		
+		
 		String sql = p.getReadySql();
 		logger.debug("【JDBC】 预编译SQL: " + sql);
 		logger.debug("【JDBC】 预编译SQL对应的参数: " + p.getParams());
