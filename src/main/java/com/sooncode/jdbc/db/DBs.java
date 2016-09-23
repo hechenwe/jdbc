@@ -61,7 +61,7 @@ public class DBs {
 			c3p0properties = c3p0;
 		} catch (Exception e) {
 			c3p0properties = null;
-			logger.debug("【加载c3p0  配置文件失败】");
+			logger.debug("【JDBC】:  加载c3p0  配置文件失败 ");
 		}
 
 		for (String str : dbConfig) {
@@ -84,7 +84,7 @@ public class DBs {
 				DataSources = Class.forName("com.mchange.v2.c3p0.DataSources");
 			} catch (ClassNotFoundException e) {
 				DataSources = null;
-				logger.info("[没有添加c3p0的jar包] DataSources 加载失败");
+				logger.info("【JDBC】: 没有添加c3p0的jar包 , DataSources 加载失败");
 			}
 
 			if (c3p0properties != null && DataSources != null) {
@@ -105,7 +105,7 @@ public class DBs {
 					ds = (DataSource) pooledDataSource.invoke(null, ds, p);
 					 
 					dss.put(db.getKey(), ds);
-					logger.info("[已添加c3p0连接池] :数据库" + db.getDataName());
+					logger.info("【JDBC】: 已添加c3p0连接池 ;数据库" + db.getDataName());
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -129,7 +129,7 @@ public class DBs {
 				connection = dataSources.get(dbKey).getConnection();
 				connection.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
 			} catch (SQLException e) {
-				logger.error("[获取数据库连接失败]");
+				logger.error("【JDBC】: 获取数据库连接失败 ");
 				e.printStackTrace();
 				return null;
 			}
@@ -148,13 +148,13 @@ public class DBs {
 			try {
 				Class.forName(DRIVER);
 			} catch (ClassNotFoundException e) {
-				logger.info("[加载数据库驱动失败]");
+				logger.info("【JDBC】: 加载数据库驱动失败 ");
 				return null;
 			}
 			try {
 				connection = DriverManager.getConnection(mysqlUrl, USERNAME, PASSWORD);
 			} catch (SQLException e) {
-				logger.info("[数据库连接失败]");
+				logger.info("【JDBC】: 数据库连接失败 ");
 				return null;
 			}
 
@@ -180,7 +180,7 @@ public class DBs {
 					}
 				}
 			} catch (Exception e) {
-				logger.info("[关闭数据库资源失败]");
+				logger.info("【JDBC】: 关闭数据库资源失败 ");
 			}
 		}
 	}
@@ -213,7 +213,7 @@ public class DBs {
 		String path = this.getClass().getResource("/").getPath();
 		File file = new File(path);
 		String classesPath = file.toString() + File.separatorChar;
-		System.out.println("[classesPath]:" + classesPath);
+		logger.debug("【JDBC】: classesPath=" + classesPath ); 
 		return classesPath;
 
 		/*

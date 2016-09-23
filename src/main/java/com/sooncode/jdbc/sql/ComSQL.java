@@ -10,17 +10,19 @@ import com.sooncode.jdbc.reflect.RObject;
 import com.sooncode.jdbc.util.T2E;
 
 /**
- * 常见的SQL语句构造类
+ * 通用SQL语句构造
  * 
  * @author pc
  *
  */
 public class ComSQL {
+	
+    private ComSQL(){}
  
-
 	/**
-	 * 构造插入数据的可执行的SQL 说明 :1.根据object对象的类名映射成数据库表名.
-	 * 2.根据object对象的属性,映射成字段,根据其属性值插入相应数据.
+	 * 构造插入数据的可执行的SQL
+	 * </br>1.根据object对象的类名映射成数据库表名.
+	 * </br>2.根据object对象的属性,映射成字段,根据其属性值插入相应数据.
 	 * 
 	 * @param object
 	 *            数据对象
@@ -143,7 +145,7 @@ public class ComSQL {
 	
 	
 	/**
-	 * 获取查询语句的可执行SQL
+	 * 获取查询语句的可执行SQL (单表)
 	 * 
 	 * @param object
 	 * @return 可执行SQL
@@ -160,14 +162,14 @@ public class ComSQL {
 		for (Entry<String, Object> entry : map.entrySet()) {
 			if (entry.getValue() != null) {
 				s = s + " AND ";
-				s = s + T2E.toColumn(entry.getKey()) + " = ?";
+				s = s + tableName+"."+ T2E.toColumn(entry.getKey()) + " = ?";
 				paramet.put(index,entry.getValue());
 				index++;
 			}
 			if (m != 0) {
 				c = c + ",";
 			}
-			c = c + T2E.toColumn(entry.getKey());
+			c = c + tableName+"."+T2E.toColumn(entry.getKey()) + " AS " + tableName+"_"+T2E.toColumn(entry.getKey());
 			m++;
 		}
 		String sql = "SELECT " + c + " FROM " + tableName + " WHERE " + s;

@@ -1,8 +1,6 @@
 package com.sooncode.jdbc;
 
-import java.beans.PropertyDescriptor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
+ 
 import java.math.BigDecimal;
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -24,7 +22,7 @@ import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 import com.sooncode.jdbc.db.DBs;
 import com.sooncode.jdbc.sql.Parameter;
-import com.sooncode.jdbc.util.T2E;
+ 
 
 /**
  * 执行SQL语句核心类
@@ -52,8 +50,8 @@ public class Jdbc {
 	
 	/**
 	 * 
-	 * @param dbKey
-	 *            数据源关键码
+	 * @param dbKey 数据源关键字
+	 *            
 	 */
 	Jdbc(String dbKey) {
 		this.dbKey = dbKey;
@@ -84,8 +82,8 @@ public class Jdbc {
 	 */
 	public Long executeUpdate(Parameter p) {
 		String sql = p.getReadySql();
-		logger.debug("【预编译SQL】: " + sql);
-		logger.debug("【可执行SQL】: " + p.getSql());
+		logger.debug("【JDBC】 预编译SQL: " + sql);
+		logger.debug("【JDBC】 预编译SQL对应的参数: " + p.getParams());
 		Connection connection = DBs.getConnection(this.dbKey);
 		PreparedStatement preparedStatement = null;
 		ResultSet resultSet = null;
@@ -106,7 +104,7 @@ public class Jdbc {
 				return n;
 			}
 		} catch (SQLException e) {
-			logger.debug("[SQL语句执行异常]: " + sql);
+			logger.debug("【JDBC】 SQL语句执行异常 : " + sql);
 			return null;
 		} finally {
 			DBs.close(resultSet, preparedStatement, connection);
@@ -128,7 +126,7 @@ public class Jdbc {
 
 			Statement statement = connection.createStatement();
 			for (String sql : sqls) {
-				logger.debug("【可执行SQL】: " + sql);
+				logger.debug("【JDBC】可执行SQL  : " + sql);
 				statement.addBatch(sql);
 			}
 			statement.executeBatch(); // 执行批处理
@@ -139,13 +137,15 @@ public class Jdbc {
 			try {
 				connection.rollback();
 			} catch (SQLException e1) {
-				// e1.printStackTrace();
+				logger.error("【JDBC】 事务回滚失败 !  "+e1.getMessage());
 			}
-			logger.error("[批量执行失败]");
+			logger.error("【JDBC】 批量执行失败 !");
 			return false;
 		}
 
 	}
+	
+	
 	/**
 	 * 批量执行更新语句（动态SQL语句）
 	 * 可防止SQL注入，推荐使用。
@@ -154,8 +154,9 @@ public class Jdbc {
 	 * @return 成功返回true ,失败返回 false.
 	 */
 	public Boolean executeUpdates( String readySql,  List<Map<Integer,Object>> parameters ) {
-		
-		logger.debug("【预编译SQL】: " + readySql);
+		logger.debug("【JDBC】 预编译SQL: \r\t" + readySql);
+		logger.debug("【JDBC】 预编译SQL对应的参数: " + parameters);
+		 
 		Connection connection = DBs.getConnection(this.dbKey);
 		try {
 			connection.setAutoCommit(false);
@@ -177,7 +178,7 @@ public class Jdbc {
 			} catch (SQLException e1) {
 			 
 			}
-			logger.error("[批量执行失败]");
+			logger.error("【JDBC】 批量执行失败 !");
 			return false;
 		}
 		
@@ -194,7 +195,9 @@ public class Jdbc {
 	 * @return List
 	 */
 	public List<Map<String, Object>> executeQueryL(Parameter parameter) {
-		logger.debug("【预编译SQL】: " + parameter.getReadySql());
+		logger.debug("【JDBC】 预编译SQL: \r\t" + parameter.getReadySql());
+		logger.debug("【JDBC】 预编译SQL对应的参数: " + parameter.getParams());
+		 
 		Connection connection = DBs.getConnection(this.dbKey);
 		List<Map<String, Object>> resultList = new LinkedList<>();
 
@@ -218,7 +221,6 @@ public class Jdbc {
 				int columnCount = resultSetMetaData.getColumnCount();
 				for (int i = 1; i <= columnCount; i++) {
 					String columnName = resultSetMetaData.getColumnLabel(i).toUpperCase();// 获取别名
-					columnName = T2E.toField(columnName);
 					Object columnValue = resultSet.getObject(i);
 					map.put(columnName, columnValue);
 				}
@@ -226,7 +228,7 @@ public class Jdbc {
 			}
 			return resultList;
 		} catch (SQLException e) {
-			logger.debug("[SQL语句执行异常]: " + parameter.getReadySql());
+			logger.debug("【JDBC】: SQL语句执行异常  \r\t " + parameter.getReadySql());
 			e.printStackTrace();
 			return null;
 		} finally {
@@ -242,9 +244,11 @@ public class Jdbc {
 	 * @param sql可执行SQL
 	 * @return map 记录数量不为1时返回null.
 	 */
-	public Map<String, Object> executeQueryM(Parameter p) {
-		logger.debug("【可执行SQL】: " + p.getSql());
-		List<Map<String, Object>> list = executeQueryL(p);
+	public Map<String, Object> executeQueryM(Parameter parameter) {
+		logger.debug("【JDBC】 预编译SQL: \r\t" + parameter.getReadySql());
+		logger.debug("【JDBC】 预编译SQL对应的参数: " + parameter.getParams());
+	 
+		List<Map<String, Object>> list = executeQueryL(parameter);
 		if (list.size() == 1) {
 			return list.get(0);
 		} else {
@@ -262,31 +266,13 @@ public class Jdbc {
 	 *            实体模型类型
 	 * @return 实体对象
 	 */
-	public Object executeQuery(Parameter p, Class<?> entityClass) {
-		logger.debug("【可执行SQL】: " + p.getReadySql());
-		List<Map<String, Object>> list = executeQueryL(p);
+	public Object executeQuery(Parameter parameter, Class<?> entityClass) {
+		logger.debug("【JDBC】 预编译SQL: \r\t" + parameter.getReadySql());
+		logger.debug("【JDBC】 预编译SQL对应的参数: " + parameter.getParams());
+		  
+		List<Map<String, Object>> list = executeQueryL(parameter);
 		if (list.size() == 1) {
-			Map<String, Object> map = list.get(0);
-			try {
-				Object object = entityClass.newInstance();
-				Field[] fields = entityClass.getDeclaredFields();
-				for (Field field : fields) {
-					Object value = map.get(field.getName());
-					if (value == null) {
-						continue;
-					}
-					PropertyDescriptor pd = new PropertyDescriptor(field.getName(), entityClass);
-					// 获得set方法
-					Method method = pd.getWriteMethod();
-					method.invoke(object, value);
-				}
-				return object;
-				
-			} catch (Exception e) {
-				e.printStackTrace();
-				return null;
-			}
-			
+			return ToEntity.toEntityObject(list.get(0), entityClass);
 		} else {
 			return null;
 		}
@@ -302,37 +288,13 @@ public class Jdbc {
 	 *            实体模型类型
 	 * @return 实体对象集合
 	 */
-	public List<?> executeQuerys(Parameter p, Class<?> entityClass) {
-		logger.debug("【预编译SQL】: " + p.getReadySql());
-		logger.debug("【可执行SQL】: " + p.getSql());
-		List<Map<String, Object>> list = executeQueryL(p);
+	public List<?> executeQuerys(Parameter parameter, Class<?> entityClass) {
+		logger.debug("【JDBC】 预编译SQL: \r\t" + parameter.getReadySql());
+		logger.debug("【JDBC】 预编译SQL对应的参数: " + parameter.getParams());
+		List<Map<String, Object>> list = executeQueryL(parameter);
+		return ToEntity.findEntityObject(list, entityClass);
 		
-		List<Object> objects = new LinkedList<>();
-		for (Map<String, Object> map : list) {
-			
-			try {
-				Object object = entityClass.newInstance();
-				Field[] fields = entityClass.getDeclaredFields();
-				for (Field field : fields) {
-					Object value = map.get(field.getName());
-					if (value == null) {
-						continue;
-					}
-					PropertyDescriptor pd = new PropertyDescriptor(field.getName(), entityClass);
-					// 获得set方法
-					Method method = pd.getWriteMethod();
-					method.invoke(object, value);
-				}
-				objects.add(object);
-				
-			} catch (Exception e) {
-				// e.printStackTrace();
-				return null;
-			}
-			
-		}
-		
-		return objects;
+		 
 	}
 
 	/**
@@ -350,7 +312,7 @@ public class Jdbc {
 	 * @return 存储过程的 返回参数值,当没有返回参数时 返回null
 	 */
 	public Object executeProcedure(String sql, Object... in) {
-		logger.debug("【存储过程 SQL】: " + sql);
+		logger.debug("【JDBC】:存储过程 SQL  " + sql);
 		Connection connection = DBs.getConnection(this.dbKey);
 		// sql 中参数的个数
 		int n = countParameter(sql, "?");
@@ -413,7 +375,7 @@ public class Jdbc {
 			for (String sql : sqls) {
 				preparedStatement = connection.prepareStatement(sql);
 				preparedStatement.executeUpdate();
-				logger.debug("【可执行SQL】: " + sql);
+				logger.debug("【JDBC】 可执行SQL : " + sql);
 			}
 			// 在try块内添加事务的提交操作，表示操作无异常，提交事务。
 			connection.commit();
@@ -433,7 +395,7 @@ public class Jdbc {
 				// 设置事务提交方式为自动提交：
 				connection.setAutoCommit(true);
 			} catch (SQLException e) {
-				logger.info("[事务提交失败]");
+				logger.info("【JDBC】:事务提交失败");
 			}
 			// if (DBs.c3p0properties == null) {
 			DBs.close(preparedStatement, connection);
@@ -494,7 +456,7 @@ public class Jdbc {
 		} catch (SQLException e) {
 
 			//e.printStackTrace();
-			logger.error("【预编译SQL设置参数失败】");
+			logger.error("【JDBC】:  预编译SQL设置参数失败 ");
 		}
 
 	}

@@ -29,7 +29,7 @@ public class JdbcDao_Test {
 	public void get(){
 		
 		User u = new  User();
-		u.setName("he or '1'='1' ");
+		u.setName("EJLKSDJFLS");
 		u = (User) jdbcDao.get(u);
 		logger.info(u);
 	}
