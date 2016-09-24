@@ -44,9 +44,9 @@ public class Parameter {
 	}
 
 	/**
-	 * 获取参数注入后的SQL语句。
-	 * 
-	 * @return
+	 * 获取参数注入后的SQL语句。</br>
+	 * 注意：该SQL不一定能直接远行！
+	 * @return 参数注入后的SQL语句
 	 */
 	public String getSql() {
 		StringBuilder sql = new StringBuilder();
@@ -64,18 +64,29 @@ public class Parameter {
 		return sql.toString();
 	}
 	/**
-	 * 参数模型是否异常
-	 * @return
+	 * 参数模型是否没有异常</br>
+	 * 当预编译SQL为空（null），或 为空字符串时，为存在异常；当预编译中的参数大于参数Map中的个数时，存在异常。
+	 * @return 存在异常时返回false；没有异常时返回true.
 	 */
-	public boolean isException(){
+	public boolean isNotException(){
 		
 		if(this.readySql == null || this.readySql.trim().equals("")){
 			return false;
 		}else{
+			StringBuilder sql = new StringBuilder(this.readySql);
+			int size = 0;
+			while(sql.indexOf("?")!=-1){
+				int n = sql.indexOf("?");
+				sql.replace(n, n + 1, "@"); 
+				size ++;
+			}
 			
-			;//int parameterSize = this.readySql.
-			
-			return true;
+			if(this.params.size()>=size){
+				return true;
+			}else{
+				return false;
+			}
+			 
 		}
 		
 		

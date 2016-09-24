@@ -21,6 +21,7 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import com.sooncode.jdbc.db.DBs;
+import com.sooncode.jdbc.result.ResultMap;
 import com.sooncode.jdbc.sql.Parameter;
  
 
@@ -83,13 +84,7 @@ public class Jdbc {
 	 * @return 一般情况是返回受影响的行数,当有主键为自增字段,在添加数据时返回 自增值。当执行出现异常时放回null.
 	 */
 	public Long executeUpdate(Parameter p) {
-		
 		 
-		
-		
-		
-		
-		
 		String sql = p.getReadySql();
 		logger.debug("【JDBC】 预编译SQL: " + sql);
 		logger.debug("【JDBC】 预编译SQL对应的参数: " + p.getParams());
@@ -265,6 +260,24 @@ public class Jdbc {
 		}
 	}
 
+	/**
+	 * 执行查询语句 (只有一条返回记录)。
+	 * 可防止SQL注入，推荐使用。
+	 * @param sql可执行SQL
+	 * @return 返回结果集对象.
+	 */
+	public ResultMap executeQuery(Parameter parameter) {
+		logger.debug("【JDBC】 预编译SQL: \r\t" + parameter.getReadySql());
+		logger.debug("【JDBC】 预编译SQL对应的参数: " + parameter.getParams());
+	 
+		List<Map<String, Object>> list = executeQueryL(parameter);
+		if (list.size() == 1) {
+			ResultMap rm =new ResultMap(list.get(0));
+			return rm;
+		} else {
+			return null;
+		}
+	}
 	 
 	/**
 	 * 执行查询语句 (只有一条返回记录)
