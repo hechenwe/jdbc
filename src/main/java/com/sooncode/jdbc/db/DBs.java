@@ -213,6 +213,7 @@ public class DBs {
 		String path = this.getClass().getResource("/").getPath();
 		File file = new File(path);
 		String classesPath = file.toString() + File.separatorChar;
+		classesPath=classesPath.replace("%20", " ");
 		logger.debug("【JDBC】: classesPath=" + classesPath ); 
 		return classesPath;
 
