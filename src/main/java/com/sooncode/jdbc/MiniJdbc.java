@@ -38,16 +38,15 @@ public class MiniJdbc {
 	private Connection connection;
 
 	/**
-	 * 初始化MiniJdbc
+	 * 构造MiniJdbc对象
 	 * 
-	 * @param dbType
-	 *            数据库类型 ：MYSQL,ORCAL,DB2等
-	 * @param ip
-	 * @param port
-	 * @param dataName
-	 * @param encodeing UTF-8
-	 * @param userName
-	 * @param password
+	 * @param dbType 数据库类型 ：MYSQL,ORCAL,DB2等
+	 * @param ip 数据库所在主机IP
+	 * @param port 端口
+	 * @param dataName 数据库名称
+	 * @param encodeing 编码 如：UTF-8
+	 * @param userName 用户名
+	 * @param password 秘密
 	 */
 	public MiniJdbc(String dbType, String ip, String port, String dataName, String encodeing, String userName, String password) {
 
@@ -72,9 +71,6 @@ public class MiniJdbc {
 
 	/**
 	 * 执行非查询语句(更新语句)
-	 * 
-	 * @param connection
-	 *            数据库连接
 	 * @param readySql
 	 *            可执行的非查询语句
 	 * @param params 
@@ -118,20 +114,14 @@ public class MiniJdbc {
 		  
 	}
 
+	 
 	/**
-	 * 执行查询语句
-	 * 
-	 * @param sql可执行SQL
+	 * 执行查询语句。
+	 * @param readySql 预编译SQL 如：SELECT * FROM USER WHERE ID = ? AND NAME LIKE ? ...
+	 * @param params 预编译SQL 对应的参数 key从1开始。
 	 * @return
-	 * @throws SQLException
 	 */
-	/**
-	 * 执行查询语句(可能有多条记录)。
-	 * 可防止SQL注入，推荐使用。
-	 * @parameter 参数模型
-	 * @return List
-	 */
-	public List<Map<String, Object>> executeQueryL(String readySql ,Map<Integer,Object> params) {
+	public List<Map<String, Object>> executeQuery(String readySql ,Map<Integer,Object> params) {
 		if (connection == null) {
 			return null;
 		}
@@ -178,10 +168,10 @@ public class MiniJdbc {
 	}
 
 	/**
-	 * 抓取对象
+	 * 获取实体对象集
 	 * 
-	 * @param list
-	 * @param clas
+	 * @param list 查询得到的list结果集
+	 * @param entityClass 实体类Class
 	 * @return List对象 ,或简单对象
 	 */
 	public List<?> getEntityObject(List<Map<String, Object>> list, Class<?> entityClass) {
@@ -234,6 +224,11 @@ public class MiniJdbc {
 
 	}
 
+	/**
+	 * 属性名称转换成数据库表对应的字段名称
+	 * @param field 属性名称
+	 * @return 字段名称
+	 */
 	private String toColumn(String field) {
 
 		String string = new String();

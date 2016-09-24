@@ -16,7 +16,7 @@ public class MiniJdbc__Test {
     	 
     	    String sql = "SELECT * FROM USER ";
     	    
-    	    List<Map<String,Object>> map = jdbc.executeQueryL(sql, null);
+    	    List<Map<String,Object>> map = jdbc.executeQuery(sql, null);
     	    logger.info(map);
 		
 	}
