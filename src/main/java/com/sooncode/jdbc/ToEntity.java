@@ -19,8 +19,11 @@ public class ToEntity {
 	 * @return List对象 ,或简单对象
 	 */
 	public static List<?> findEntityObject(List<Map<String, Object>> list, Class<?> clas) {
-		String tableName = T2E.toColumn(clas.getSimpleName());
+		if(list == null || list.size()==0){
+			return new LinkedList<>();
+		}
 		List<Object> objects = new LinkedList<>();
+		String tableName = T2E.toColumn(clas.getSimpleName());
 		for (Map<String, Object> map : list) {
 				RObject rObj = new RObject(clas);
 				Field[] fields = clas.getDeclaredFields();

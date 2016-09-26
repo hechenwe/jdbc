@@ -243,13 +243,10 @@ public class RObject {
 	/** 获取对象的第一个属性名称 （主键） */
 	public String getPk() {
 
-		// String str = "Integer Long String"; //主键可能的数据类型
 		Class<?> c = object.getClass();
 		Field[] fields = c.getDeclaredFields();
 		for (Field field : fields) {
-			if (!field.getName().equals("serialVersionUID")) { // &&
-																// str.contains(field.getType().getSimpleName()))
-																// {
+			if (!field.getName().equals("serialVersionUID")) {  
 				return field.getName();
 			}
 		}

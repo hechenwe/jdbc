@@ -160,7 +160,7 @@ public class JdbcDao implements JdbcDaoInterface {
 		sizeP.setParams(where.getParams());
 
 		List<Map<String, Object>> list = jdbc.executeQueryL(sqlP);
-		Long size = (Long) jdbc.executeQueryM(sizeP).get("size");
+		Long size = (Long) jdbc.executeQueryM(sizeP).get("SIZE");
 		List<?> lists = ToEntity.findEntityObject(list, conditions.getObj().getClass());
 		Pager<?> pager = new Pager<>(pageNum, pageSize, size, lists);
 		return pager;
@@ -190,7 +190,7 @@ public class JdbcDao implements JdbcDaoInterface {
 		sizeP.setParams(where.getParams());
 
 		List<Map<String, Object>> list = jdbc.executeQueryL(sqlP);
-		Long size = (Long) jdbc.executeQueryM(sizeP).get("size");
+		Long size = (Long) jdbc.executeQueryM(sizeP).get("SIZE");
 		List<?> lists = ToEntity.findEntityObject(list, entityClass);
 		Pager<?> pager = new Pager<>(pageNum, pageSize, size, lists);
 		return pager;

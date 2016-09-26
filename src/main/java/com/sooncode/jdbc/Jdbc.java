@@ -84,7 +84,10 @@ public class Jdbc {
 	 * @return 一般情况是返回受影响的行数,当有主键为自增字段,在添加数据时返回 自增值。当执行出现异常时放回null.
 	 */
 	public Long executeUpdate(Parameter p) {
-		 
+		if(p.isNotException()==false){
+			logger.debug("【JDBC】:预编译SQL和参数出现异常！");
+			return null;
+		}
 		String sql = p.getReadySql();
 		logger.debug("【JDBC】 预编译SQL: " + sql);
 		logger.debug("【JDBC】 预编译SQL对应的参数: " + p.getParams());
@@ -118,11 +121,13 @@ public class Jdbc {
 	/**
 	 * 批量执行更新语句(静态SQL语句)
 	 * 
-	 * @param sqls
-	 *            可执行更新的SQL语句集合
+	 * @param sqls 可执行更新的SQL语句集合
+	 *            
 	 * @return 成功返回true ,失败返回 false.
 	 */
 	public Boolean executeUpdates(List<String> sqls) {
+		
+		
 
 		Connection connection = DBs.getConnection(this.dbKey);
 		try {
@@ -233,8 +238,8 @@ public class Jdbc {
 			return resultList;
 		} catch (SQLException e) {
 			logger.debug("【JDBC】: SQL语句执行异常  \r\t " + parameter.getReadySql());
-			e.printStackTrace();
-			return null;
+			//e.printStackTrace();
+			return new LinkedList<>();
 		} finally {
 			DBs.close(resultSet, preparedStatement, connection);
 		}
@@ -362,13 +367,11 @@ public class Jdbc {
 			}
 
 		} catch (SQLException e) {
-			e.printStackTrace();
+			logger.debug(" 【JDBC】 执行存储过程,出现异常："+e.getMessage());
+			//e.printStackTrace();
 			return null;
 		} finally {
-
-			// if (DBs.c3p0properties == null) {
 			DBs.close(callableStatement, connection);
-			// }
 		}
 	}
 
@@ -407,9 +410,7 @@ public class Jdbc {
 				// .在catch块内添加回滚事务，表示操作出现异常，撤销事务：
 				connection.rollback();
 			} catch (SQLException e1) {
-				// e1.printStackTrace();
 			}
-			// e.printStackTrace();
 			return false;
 
 		} finally {
@@ -476,8 +477,6 @@ public class Jdbc {
 			}
 
 		} catch (SQLException e) {
-
-			//e.printStackTrace();
 			logger.error("【JDBC】:  预编译SQL设置参数失败 ");
 		}
 
