@@ -20,6 +20,8 @@ import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
 
+import com.sooncode.jdbc.constant.STRING;
+
 /**
  * 数据库
  * 
@@ -27,6 +29,10 @@ import org.apache.log4j.Logger;
  *
  */
 public class DBs {
+	/**
+	 * 数据库配置文件名称后缀"_db.properties"
+	 */
+	private static final String DB_PROPERTIES = "_db.properties";
 	/** 数据源缓存 */
 	private static Map<String, DB> dBcache = new HashMap<>();
 
@@ -194,7 +200,7 @@ public class DBs {
 		for (int i = 0; i < test.length; i++) {
 
 			String fileName = test[i];
-			if (fileName.contains("_db.properties")) {
+			if (fileName.contains(DB_PROPERTIES)) {
 				dbCongig.add(fileName);
 			}
 		}
@@ -213,7 +219,7 @@ public class DBs {
 		String path = this.getClass().getResource("/").getPath();
 		File file = new File(path);
 		String classesPath = file.toString() + File.separatorChar;
-		classesPath=classesPath.replace("%20", " ");
+		classesPath=classesPath.replace("%20", STRING.SPACING);
 		logger.debug("【JDBC】: classesPath=" + classesPath ); 
 		return classesPath;
 

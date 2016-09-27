@@ -22,6 +22,11 @@ import org.apache.log4j.Logger;
  */
 public class RObject {
 	public static Logger logger = Logger.getLogger("RObject.class");
+	private static final String NULL_STR="";
+	private static final String CLASS="class ";
+	private static final String LIST_INTERFACE="interface java.util.List";
+	private static final String JAVA_TYPES="Integer Long Short Byte Float Double Character Boolean Date String";
+	private static final String UID="serialVersionUID";
 	
 	/** 被反射代理的对象 */
 	private Object object;
@@ -66,9 +71,7 @@ public class RObject {
 
 	/** 获取对象的类名 */
 	public String getClassName() {
-		// String[] str = this.object.getClass().getName().split("\\.");
-		return this.object.getClass().getSimpleName();// str[str.length -
-														// 1].trim();
+		return this.object.getClass().getSimpleName(); 
 	}
 
 	/** 获取对象的全类名 */
@@ -98,7 +101,7 @@ public class RObject {
 			Field[] fields = thisClass.getDeclaredFields();
 			if(n==0){
 				for (Field f : fields) {
-					if (!f.getName().equals("serialVersionUID")) {
+					if (!f.getName().equals(UID)) {
 						list.add(f);
 					}
 				}
@@ -107,7 +110,7 @@ public class RObject {
 				for (Field f : fields) {
 					int i = f.getModifiers();
 					boolean isPrivate = Modifier.isPrivate(i);
-					if (!f.getName().equals("serialVersionUID") && isPrivate == false) {
+					if (!f.getName().equals(UID) && isPrivate == false) {
 						list.add(f);
 					}
 				}
@@ -126,7 +129,7 @@ public class RObject {
 	 * @return
 	 */
 	public Boolean hasField(String field) {
-		if (field == null || field.equals("")) {
+		if (field == null || field.equals(NULL_STR)) {
 			return false;
 		}
 		List<Field> fields = this.getFields();
@@ -152,10 +155,10 @@ public class RObject {
 		List<Field> fields = getFields();
 		for (Field f : fields) {
 			String typeName = f.getType().toString();
-			if (typeName.contains("interface java.util.List")) {
+			if (typeName.contains(LIST_INTERFACE)) {
 				ParameterizedType pt = (ParameterizedType) f.getGenericType();
 				String str = pt.getActualTypeArguments()[0].toString(); // 获取List泛型参数类型名称
-				str = str.replace("class ", "").trim();// 全类名
+				str = str.replace(CLASS, NULL_STR).trim();// 全类名
 				if (str.equals(listClass.getName())) {
 					return f.getName();
 				}
@@ -227,13 +230,13 @@ public class RObject {
 	/** 获取对象的属性和其对应的值 */
 	public Map<String, Object> getFiledAndValue() {
 
-		String str = "Integer Long Short Byte Float Double Character Boolean Date String";
+		String str = JAVA_TYPES;
 		Map<String, Object> map = new HashMap<>();
 		 
 		List<Field> fields = this.getFields();
 		for (Field field : fields) {
 			// logger.debug(field.getName());
-			if (!field.getName().equals("serialVersionUID") && str.contains(field.getType().getSimpleName())) {
+			if (!field.getName().equals(UID) && str.contains(field.getType().getSimpleName())) {
 				map.put(field.getName(), this.invokeGetMethod(field.getName()));
 			}
 		}
@@ -246,7 +249,7 @@ public class RObject {
 		Class<?> c = object.getClass();
 		Field[] fields = c.getDeclaredFields();
 		for (Field field : fields) {
-			if (!field.getName().equals("serialVersionUID")) {  
+			if (!field.getName().equals(UID)) {  
 				return field.getName();
 			}
 		}
@@ -263,12 +266,12 @@ public class RObject {
 	/** 获取对象的第一个属性的值 */
 	public Object getPkValue() {
 
-		String str = "Integer Long Short Byte Float Double Character Boolean Date String";
+		String str = JAVA_TYPES;// "Integer Long Short Byte Float Double Character Boolean Date String";
 		Class<?> c = object.getClass();
 		Field[] fields = c.getDeclaredFields();
 		for (Field field : fields) {
 			// logger.debug(field.getName());
-			if (!field.getName().equals("serialVersionUID") && str.contains(field.getType().getSimpleName())) {
+			if (!field.getName().equals(UID) && str.contains(field.getType().getSimpleName())) {
 
 				return this.invokeGetMethod(field.getName());
 			}
