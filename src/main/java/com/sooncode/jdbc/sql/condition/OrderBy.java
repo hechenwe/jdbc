@@ -1,5 +1,6 @@
 package com.sooncode.jdbc.sql.condition;
 
+import com.sooncode.jdbc.constant.STRING;
 import com.sooncode.jdbc.util.T2E;
 
 /**
@@ -17,7 +18,7 @@ public class OrderBy {
 	 */
 	public OrderBy(String key,Sort sort){
 		
-		this.orderBy= T2E.toColumn(key)+" " + sort.name();
+		this.orderBy= T2E.toColumn(key)+STRING.SPACING + sort.name();
 	}	
 	
 	public String toString (){

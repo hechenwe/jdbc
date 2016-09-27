@@ -80,17 +80,17 @@ public class ComSQL {
 		Parameter p = new Parameter();
 		String tableName = T2E.toColumn(object.getClass().getSimpleName());
 		Map<String, Object> map = new RObject(object).getFiledAndValue();
-		String sql = "DELETE FROM " + tableName + " WHERE ";
-		String s = "";
+		String sql = SQL_KEY.DELETE  + tableName + SQL_KEY.WHERE;
+		String s = new String ();
 		int n = 0;
 		Map<Integer,Object> par = new HashMap<>();
 		int index=1;
 		for (Entry<String, Object> entry : map.entrySet()) {
 			if (entry.getValue() != null) {
 				if (n != 0) {
-					s = s + " AND ";
+					s = s + SQL_KEY.AND;
 				}
-				s = s + T2E.toColumn(entry.getKey()) + "=?"; 
+				s = s + T2E.toColumn(entry.getKey()) +   SQL_KEY.EQ  + STRING.QUESTION; 
 				par.put(index,entry.getValue());
 				index++;
 				n++;
@@ -118,10 +118,10 @@ public class ComSQL {
 		Map<String, Object> map = new RObject(object).getFiledAndValue();
 		RObject rObject = new RObject(object);
 		int n = 0;
-		String s = "";
+		String s = new String();
 		String pk = T2E.toColumn(rObject.getPk());
 		
-		String pkString = pk + "=?";// + rObject.getPkValue() + "'";
+		String pkString = pk + SQL_KEY.EQ + STRING.QUESTION ; 
 		Map<Integer,Object> param = new HashMap<>();
 		
 		int index=1;
@@ -129,9 +129,9 @@ public class ComSQL {
 			
 			if (entry.getValue() != null && !entry.getKey().trim().equals(rObject.getPk().trim())) {
 				if (n != 0) {
-					s = s + " , ";
+					s = s + SQL_KEY.COMMA;
 				}
-				s = s + T2E.toColumn(entry.getKey()) + "=?" ;//+ entry.getValue() + "'";
+				s = s + T2E.toColumn(entry.getKey())  + SQL_KEY.EQ + STRING.QUESTION ;
 				param.put(index,entry.getValue());
 				index++;
 				n++;
@@ -139,7 +139,7 @@ public class ComSQL {
 		}
 		param.put(param.size()+1, rObject.getPkValue());
 		
-		String sql = "UPDATE " + tableName + "  SET  " + s + " WHERE " + pkString;
+		String sql = SQL_KEY.UPDATE + tableName + SQL_KEY.SET  + s + SQL_KEY.WHERE + pkString;
 		p.setReadySql(sql);
 		p.setParams(param);
 		return p;
@@ -180,70 +180,7 @@ public class ComSQL {
 		p.setParams(paramet);
 		return p;
 	}
-	
-	public static String from (Object...objs){
-		String from = "";
-		int n = 0;
-		for (Object o : objs) {
-			
-			if(n != 0){
-				from = from + " , ";
-			}
-			
-			from = from + T2E.toColumn(o.getClass().getSimpleName());
-			n++;
-		}
-		return from;
-	}
-	
-	/**
-	 * 
-	 * 超级查询
-	 * @param object
-	 * @return 可执行SQL
-	 */
-	public static String supSelect(Object ... objs) {
-		
-		String sql = "SELECT " + columns(objs) + " FROM "+ from(objs) + " WHERE 1=1 " + joint(objs) + where(objs);
-		
-		return sql;
-	}
-	
-	/**
-	 * 
-	 * 超级查询 连接分析 
-	 * @param object
-	 * @return 可执行SQL
-	 */
-	public static String joint(Object ... objs) {
-		
-		Map<String,String> map = new HashMap<>();
-		for (Object o : objs) {
-			RObject rO = new RObject(o);
-			map.put(rO.getClassName(),rO.getPk());
-		}
-		
-		String joint = "";
-		 
-		for(Map.Entry<String, String> e : map.entrySet()){
-			
-			String fk = T2E.toColumn(e.getValue());
-			String value = e.getValue();
-			for (Object o : objs) {
-				RObject rO = new RObject(o);
-				if(rO.hasField(value)  && !e.getKey().equals(rO.getClassName())){
-					joint = joint + " AND "	;
-					joint = joint +T2E.toColumn(e.getKey())+"."+fk + " = " + T2E.toColumn(rO.getClassName())+"."+ fk;	
-					 
-				}
-			}
-		}
-		
-		return joint;
-	}
-	
 	 
-	
 	
 	/**
 	 * 获取字段
@@ -254,12 +191,12 @@ public class ComSQL {
 		String tableName = T2E.toColumn(object.getClass().getSimpleName());
 		Map<String, Object> columns = new RObject(object).getFiledAndValue();
 		int m = 0;
-		String c = "";
+		String c = new String();
 		for (Entry<String, Object> entry : columns.entrySet()) {
 			if (m != 0) {
-				c = c + ",";
+				c = c + SQL_KEY.COMMA;
 			}
-			c = c +tableName + "."+ T2E.toColumn(entry.getKey()) + " AS "+tableName + "_"+ T2E.toColumn(entry.getKey());
+			c = c +tableName + STRING.POINT+ T2E.toColumn(entry.getKey()) + SQL_KEY.AS+tableName + STRING.UNDERLINE+ T2E.toColumn(entry.getKey());
 			m++;
 		}
 		return c;
@@ -272,11 +209,11 @@ public class ComSQL {
 	 * @return
 	 */
 	public static String columns (Object...objs){
-		 String sql = "";
+		 String sql = new String ();
 		 int i = 0;
 		 for (Object o : objs) {
 			 if(i != 0){
-				 sql = sql + " , ";
+				 sql = sql + SQL_KEY.COMMA;
 			 }
 			sql = sql + columns(o);
 			i++;
@@ -296,13 +233,13 @@ public class ComSQL {
 		Parameter p = new Parameter();
 		String tableName = T2E.toColumn(object.getClass().getSimpleName());
 		Map<String, Object> map = new RObject(object).getFiledAndValue();
-		String s = "";
+		String s = new String ();
 		Map<Integer,Object> paramets = new HashMap<>();
 		Integer index = 1;
 		for (Entry<String, Object> entry : map.entrySet()) {
 			if (entry.getValue() != null) {
-				s = s + " AND ";
-				s = s + tableName + "."+ T2E.toColumn(entry.getKey()) + " = ?";// + entry.getValue() + "'";
+				s = s + SQL_KEY.AND;
+				s = s + tableName +  STRING.POINT + T2E.toColumn(entry.getKey())+SQL_KEY.EQ +STRING.QUESTION ; 
 				paramets.put(index,entry.getValue());
 			}
 		}
@@ -326,7 +263,7 @@ public class ComSQL {
 	public static Parameter select(Object object, Long pageNumber, Long pageSize) {
 		Long index = (pageNumber - 1) * pageSize;
 		Parameter p = select(object);
-		String sql = p.getReadySql() + " LIMIT " + index + "," + pageSize;
+		String sql = p.getReadySql() + SQL_KEY.LIMIT + index + STRING.COMMA + pageSize;
 		p.setReadySql(sql);
 		return p;
 	}
@@ -341,18 +278,18 @@ public class ComSQL {
 		Parameter p = new Parameter();
 		String tableName = T2E.toColumn(object.getClass().getSimpleName());
 		Map<String, Object> map = new RObject(object).getFiledAndValue();
-		String s = "1=1";
+		String s = SQL_KEY.ONE_EQ_ONE ;
 		Map<Integer,Object> paramet = new HashMap<>();
 		int index =1;
 		for (Entry<String, Object> entry : map.entrySet()) {
 			if (entry.getValue() != null) {
-				s = s + " AND ";
-				s = s + T2E.toColumn(entry.getKey()) + "=?" ;//+ entry.getValue() + "'";
+				s = s +SQL_KEY.AND;
+				s = s + T2E.toColumn(entry.getKey()) + SQL_KEY.EQ + STRING.QUESTION ; 
 				paramet.put(index,entry.getValue());
 				index ++;
 			}
 		}
-		String sql = "SELECT COUNT(1) AS SIZE" + " FROM " + tableName + " WHERE " + s;
+		String sql =  SQL_KEY.SELECT + SQL_KEY.COUNT + SQL_KEY.AS + SQL_KEY.SIZE + SQL_KEY.FROM + tableName +SQL_KEY.WHERE+ s;
 		p.setReadySql(sql);
 		p.setParams(paramet);
 		return p;
@@ -379,17 +316,17 @@ public class ComSQL {
 			map.put(table, pk);
 		}
 		
-		String where = "";
-		String from = " " + leftTable;
+		String where = new String ();
+		String from = STRING.SPACING + leftTable;
 		int m = 0;
 		
 		 
 		for (Map.Entry<String, String> en : map.entrySet()) {
 			if (m != 0) {
-				where = where + " AND ";
+				where = where + SQL_KEY.AND;
 			}
-			where = where + leftTable + "." + en.getValue() + " = " + en.getKey() + "." + en.getValue();
-			from = from + "," + en.getKey();
+			where = where + leftTable + STRING.POINT  + en.getValue() + SQL_KEY.EQ  + en.getKey() + STRING.POINT + en.getValue();
+			from = from + STRING.COMMA + en.getKey();
 			m++;
 		}
 		
@@ -410,7 +347,7 @@ public class ComSQL {
 		}
 		
 		
-		String sql = "SELECT COUNT(1) AS SIZE  FROM " + from + " WHERE " + where + leftWhere;
+		String sql = SQL_KEY.SELECT + SQL_KEY.COUNT + SQL_KEY.AS + SQL_KEY.SIZE + SQL_KEY.FROM  + from + SQL_KEY.WHERE + where + leftWhere;
 		leftP.setReadySql(sql);
 		leftP.setParams(paramets);
 		return leftP;
@@ -442,25 +379,25 @@ public class ComSQL {
 		Map<String, Object> leftFileds = new RObject(left).getFiledAndValue();//EntityCache.getKeyAndValue(left);
 		Map<String, Object> rightFileds =new RObject(right).getFiledAndValue();// EntityCache.getKeyAndValue(right);
 
-		String col = "";
+		String col = new String();
 		int n = 0;
 		for (Map.Entry<String, Object> en : leftFileds.entrySet()) {
 			if (n != 0) {
-				col = col + " , ";
+				col = col + SQL_KEY.COMMA;
 			}
-			col = col + leftTable + "." + T2E.toColumn(en.getKey()) + " AS " + leftTable + "_" + T2E.toColumn(en.getKey());
+			col = col + leftTable + STRING.POINT  + T2E.toColumn(en.getKey()) + SQL_KEY.AS+ leftTable + STRING.UNDERLINE + T2E.toColumn(en.getKey());
 			n++;
 		}
 		for (Map.Entry<String, Object> en : rightFileds.entrySet()) {
 
-			col = col + " , " + rightTable + "." + T2E.toColumn(en.getKey()) + " AS " + rightTable + "_" + T2E.toColumn(en.getKey());
+			col = col + SQL_KEY.COMMA + rightTable + STRING.POINT + T2E.toColumn(en.getKey()) + SQL_KEY.AS + rightTable + STRING.UNDERLINE + T2E.toColumn(en.getKey());
 
 		}
-		String sql = "SELECT " + col + " FROM " + leftTable + " ," + middleTable + " , " + rightTable;
+		String sql = SQL_KEY.SELECT  + col + SQL_KEY.FROM + leftTable + SQL_KEY.COMMA + middleTable + SQL_KEY.COMMA + rightTable;
 
-		sql = sql + " WHERE " + leftTable + "." + leftPk + " = " + middleTable + "." + leftPk + " AND " + rightTable + "." + rightPk + " = " + middleTable + "." + rightPk + " AND " + leftTable + "." + leftPk + "='" + leftFileds.get(T2E.toField(leftPk)) + "'";
+		sql = sql + SQL_KEY.WHERE + leftTable + STRING.POINT + leftPk + SQL_KEY.EQ+ middleTable + STRING.POINT + leftPk + SQL_KEY.AND + rightTable + STRING.POINT + rightPk + SQL_KEY.EQ + middleTable +  STRING.POINT + rightPk + SQL_KEY.AND  + leftTable + STRING.POINT  + leftPk + STRING.EQ + STRING.S_QUOTES   + leftFileds.get(T2E.toField(leftPk)) + STRING.S_QUOTES;
 		Long index = (pageNumber - 1) * pageSize;
-		sql = sql + " LIMIT " + index + "," + pageSize;
+		sql = sql + SQL_KEY.LIMIT   + index +  STRING.COMMA  + pageSize;
         p.setReadySql(sql);
 		return p;
 	}
@@ -483,32 +420,32 @@ public class ComSQL {
 		String leftPk = T2E.toColumn(leftRObject.getPk());
 		Object leftValue = leftRObject.getPkValue();
 		Map<String, Object> leftFileds =new RObject(left).getFiledAndValue();// EntityCache.getKeyAndValue(left);
-		String col = "";
+		String col = new String();
 		int n = 0;
 		for (Map.Entry<String, Object> en : leftFileds.entrySet()) {
 			if (n != 0) {
-				col = col + ",";
+				col = col +STRING.COMMA ;
 			}
-			col = col + " " + leftTable + "." + T2E.toColumn(en.getKey()) + " AS " + leftTable + "_" + T2E.toColumn(en.getKey());
+			col = col + STRING.SPACING + leftTable + STRING.POINT + T2E.toColumn(en.getKey()) + SQL_KEY.AS  + leftTable + STRING.UNDERLINE + T2E.toColumn(en.getKey());
 			n++;
 		}
 		 
 		Map<String, Object> field = new RObject(right).getFiledAndValue();//EntityCache.getKeyAndValue(right);
 
 		for (Map.Entry<String, Object> en : field.entrySet()) {
-			col = col + "," + rightTable + "." + T2E.toColumn(en.getKey()) + " AS " + rightTable + "_" + T2E.toColumn(en.getKey());
+			col = col + STRING.COMMA  + rightTable + STRING.POINT + T2E.toColumn(en.getKey()) + SQL_KEY.AS +  rightTable + STRING.UNDERLINE + T2E.toColumn(en.getKey());
 		}
 
-		String where = "";
-		String from = " " + leftTable;
+		String where = new String();
+		String from = STRING.SPACING  + leftTable;
 
-		where = where + leftTable + "." + leftPk + " = " + rightTable + "." + leftPk;
-		where = where +" AND "+leftTable + "." + leftPk + " = '" + leftValue + "'" ;
-		from = from + "," + rightTable;
+		where = where + leftTable + STRING.POINT + leftPk + SQL_KEY.EQ + rightTable + STRING.POINT+ leftPk;
+		where = where +SQL_KEY.AND +leftTable + STRING.POINT + leftPk + SQL_KEY.EQ + STRING.S_QUOTES  + leftValue + STRING.S_QUOTES ;
+		from = from + STRING.COMMA  + rightTable;
 
-		String sql = "SELECT " + col + " FROM " + from + " WHERE " + where;
+		String sql = SQL_KEY.SELECT  + col + SQL_KEY.FROM  + from +  SQL_KEY.WHERE  + where;
 		Long index = (pageNumber - 1) * pageSize;
-		sql = sql + " LIMIT " + index + "," + pageSize;
+		sql = sql +  SQL_KEY. LIMIT  + index + STRING.COMMA + pageSize;
 		p.setReadySql(sql);
 		 
 		return p;
@@ -531,14 +468,14 @@ public class ComSQL {
 		String leftPk = T2E.toColumn(leftRObject.getPk());
 		Object leftValue = leftRObject.getPkValue();
 		
-		String where = "";
-		String from = " " + leftTable;
+		String where = new String();
+		String from = STRING.SPACING + leftTable;
 		
-		where = where + leftTable + "." + leftPk + " = " + rightTable + "." + leftPk;
-		where = where +" AND "+leftTable + "." + leftPk + " = '" + leftValue + "'" ;
-		from = from + "," + rightTable;
+		where = where + leftTable + STRING.POINT + leftPk + SQL_KEY.EQ + rightTable + STRING.POINT + leftPk;
+		where = where +SQL_KEY.AND+leftTable + STRING.POINT + leftPk + SQL_KEY.EQ + STRING.S_QUOTES  + leftValue +  STRING.S_QUOTES ;
+		from = from + STRING.COMMA + rightTable;
 		
-		String sql = "SELECT COUNT(1) AS SIZE FROM " + from + " WHERE " + where;
+		String sql = SQL_KEY.SELECT + SQL_KEY.COUNT + SQL_KEY.AS + SQL_KEY.SIZE + SQL_KEY.FROM + from +  SQL_KEY.WHERE   + where;
 		p.setReadySql(sql);
 		p.setParams(new HashMap<Integer,Object>());
 		return p;
@@ -559,13 +496,13 @@ public class ComSQL {
 		String leftTable = T2E.toColumn(left.getClass().getSimpleName());
 		
 		Map<String, Object> leftFileds = new RObject(left).getFiledAndValue();//EntityCache.getKeyAndValue(left);
-		String col = "";
+		String col = new String();
 		int n = 0;
 		for (Map.Entry<String, Object> en : leftFileds.entrySet()) {
 			if (n != 0) {
-				col = col + ",";
+				col = col +STRING.COMMA ;
 			}
-			col = col + " " + leftTable + "." + T2E.toColumn(en.getKey()) + " AS " + leftTable + "_" + T2E.toColumn(en.getKey());
+			col = col + STRING.SPACING  + leftTable +STRING.POINT  + T2E.toColumn(en.getKey()) +SQL_KEY.AS  + leftTable + STRING.UNDERLINE + T2E.toColumn(en.getKey());
 			n++;
 		}
 		
@@ -580,20 +517,20 @@ public class ComSQL {
 			Map<String, Object> field = new RObject(obj).getFiledAndValue();//EntityCache.getKeyAndValue(obj) ;
 			
 			for (Map.Entry<String, Object> en : field.entrySet()) {
-				col = col + "," + table + "." + T2E.toColumn(en.getKey()) + " AS " + table + "_" + T2E.toColumn(en.getKey());
+				col = col +STRING.COMMA  + table + STRING.POINT  + T2E.toColumn(en.getKey()) + SQL_KEY.AS  + table + STRING.UNDERLINE+ T2E.toColumn(en.getKey());
 			}
 		}
 		
-		String where = "";
-		String from = " " + leftTable;
+		String where = new String();
+		String from = STRING.SPACING + leftTable;
 		int m = 0;
 		 
 		for (Map.Entry<String, String> en : map.entrySet()) {
 			if (m != 0) {
-				where = where + " AND ";
+				where = where + SQL_KEY.AND ; 
 			}
-			where = where + leftTable + "." + en.getValue() + " = " + en.getKey() + "." + en.getValue();
-			from = from + "," + en.getKey();
+			where = where + leftTable + STRING.POINT  + en.getValue() + SQL_KEY.EQ  + en.getKey() + STRING.POINT+ en.getValue();
+			from = from + STRING.COMMA + en.getKey();
 			m++;
 		}
 		
@@ -613,7 +550,7 @@ public class ComSQL {
 			}
 		}
 		
-		String sql = "SELECT " + col + " FROM " + from + " WHERE " + where + leftWhere;
+		String sql =SQL_KEY.SELECT  + col + SQL_KEY.FROM + from + SQL_KEY.WHERE  + where + leftWhere;
 		
 		leftP.setReadySql(sql);
 		leftP.setParams(paramets);

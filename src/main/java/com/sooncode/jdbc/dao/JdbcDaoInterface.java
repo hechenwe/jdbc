@@ -110,6 +110,13 @@ public interface JdbcDaoInterface {
 	 * @return 更新数量
 	 */
 	public Long update(Object entityObject)  ;
+	/**
+	 * 更新实体
+	 * @param oldEntityObject 已存在的实体 （以这个实体为条件查询）
+	 * @param newEnityObject 以这个实体的条件更新
+	 * @return 成功返回1;失败返回 0.
+	 */
+	public Long update(Object oldEntityObject,Object newEnityObject);
 
 	/**
 	 * 删除一个实体对象
@@ -117,6 +124,6 @@ public interface JdbcDaoInterface {
 	 * @param object
 	 * @return 删除数量
 	 */
-	public int delete(Object entityObject)  ;
+	public Long delete(Object entityObject)  ;
 	 
 }

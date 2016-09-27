@@ -45,6 +45,32 @@ public class JdbcDao_Test {
 		
 	}
 	
+	@Test 
+	public void delete (){
+		User u = new User ();
+		u.setId(345);
+		long n = jdbcDao.delete(u);
+		logger.info(n);
+	}
+	@Test 
+	public void update (){
+		User u = new User ();
+		u.setId(1072);
+		u.setName("ni mei");
+		Long n = jdbcDao.update(u);
+		logger.info(n);
+	}
+	@Test 
+	public void update2 (){
+		User u = new User ();
+		//u.setId(1072);
+		u.setName("ni mei");
+		
+		User newU = new User();
+		newU.setAge(100);
+		Long n = jdbcDao.update(u,newU);
+		logger.info(n);
+	}
 	
 	@SuppressWarnings("unchecked")
 	@Test

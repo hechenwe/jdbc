@@ -3,6 +3,8 @@ package com.sooncode.jdbc.sql.condition;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.sooncode.jdbc.constant.SQL_KEY;
+import com.sooncode.jdbc.constant.STRING;
 import com.sooncode.jdbc.sql.Parameter;
 
 public class Or extends Cond {
@@ -14,7 +16,7 @@ public class Or extends Cond {
         
 		Parameter p = new Parameter();
 		
-		String sql ="( "+ a.getReadySql() + " OR " + b.getReadySql()+ " )";
+		String sql =SQL_KEY.L_BRACKET + a.getReadySql() + SQL_KEY.OR + b.getReadySql()+ SQL_KEY.R_BRACKET ;//" )";
 		p.setReadySql(sql);
 		
 		Map<Integer,Object> param = new HashMap<>();
@@ -39,15 +41,15 @@ public class Or extends Cond {
 			String sql = new String ();//   "( "+ a.getReadySql() + " AND " + b.getReadySql()+" )";
 			Map<Integer,Object> param = new HashMap<>();
 			Parameter p = new Parameter();
-			sql= sql + "( ";
+			sql= sql + SQL_KEY.L_BRACKET ;//"( ";
 			int n = 1;
 			for (Cond c : conds) {
 				Parameter cParam = c.parameter;
 				if(n==1){
-					sql = sql + " " + cParam.getReadySql();
+					sql = sql + STRING.SPACING  + cParam.getReadySql();
 					
 				}else{
-					sql = sql + " OR " + cParam.getReadySql();
+					sql = sql + SQL_KEY.OR  + cParam.getReadySql();
 				}
 				n++;
 				for (int i =1;i <= cParam.getParams().size();i++) {
@@ -55,7 +57,7 @@ public class Or extends Cond {
 					param.put(param.size()+1, value);
 				}
 			}
-			sql = sql + " )";
+			sql = sql + SQL_KEY.R_BRACKET ;//" )";
 			p.setReadySql(sql);
 			p.setParams(param);
 			this.parameter = p;

@@ -121,6 +121,17 @@ public final class JdbcService {
 		return jdbcDao.update(object);
 
 	}
+	
+	/**
+	 * 更新一个实体
+	 * @param oldEntityObject 已存在的实体 （以这个实体为条件查询）
+	 * @param newEnityObject 以这个实体的条件更新
+	 * @return 成功返回1;失败返回 0.
+	 */
+	public Long update(Object oldEntityObject,Object newEnityObject) {
+		return jdbcDao.update(oldEntityObject, newEnityObject);
+		
+	}
 
 	/**
 	 * 移除一个实体对象
@@ -128,7 +139,7 @@ public final class JdbcService {
 	 * @param object
 	 * @return 删除数量
 	 */
-	public int delete(Object object) {
+	public Long delete(Object object) {
 		return jdbcDao.delete(object);
 
 	}

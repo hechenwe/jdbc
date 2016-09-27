@@ -11,6 +11,9 @@ import org.apache.log4j.Logger;
 import com.sooncode.jdbc.Jdbc;
 import com.sooncode.jdbc.JdbcFactory;
 import com.sooncode.jdbc.ToEntity;
+import com.sooncode.jdbc.constant.JavaBaseType;
+import com.sooncode.jdbc.constant.SQL_KEY;
+import com.sooncode.jdbc.constant.STRING;
 import com.sooncode.jdbc.reflect.Genericity;
 import com.sooncode.jdbc.reflect.RObject;
 import com.sooncode.jdbc.sql.ComSQL;
@@ -67,7 +70,7 @@ public class JdbcDao implements JdbcDaoInterface {
 		String tableName = T2E.toColumn(obj.getClass().getSimpleName());
 		String columns = ComSQL.columns(obj);
 		Parameter p = con.getWhereSql();
-		String sql = "SELECT " + columns + " FROM " + tableName + " WHERE 1=1 " + p.getReadySql();
+		String sql = SQL_KEY.SELECT  + columns +  SQL_KEY.FROM  + tableName +  SQL_KEY.WHERE+ SQL_KEY.ONE_EQ_ONE   + p.getReadySql();
 		p.setReadySql(sql);
 		List<Map<String, Object>> list = jdbc.executeQueryL(p);
 		List<?> objects = ToEntity.findEntityObject(list, obj.getClass());
@@ -80,7 +83,7 @@ public class JdbcDao implements JdbcDaoInterface {
 		String tableName = T2E.toColumn(obj.getClass().getSimpleName());
 		String columns = ComSQL.columns(obj);
 		Parameter p = cond.getParameter();
-		String sql = "SELECT " + columns + " FROM " + tableName + " WHERE " + p.getReadySql();
+		String sql =  SQL_KEY.SELECT  + columns +  SQL_KEY.FROM  + tableName + SQL_KEY.WHERE  + p.getReadySql();
 		p.setReadySql(sql);
 		List<Map<String, Object>> list = jdbc.executeQueryL(p);
 		List<?> objects = ToEntity.findEntityObject(list, obj.getClass());
@@ -147,9 +150,9 @@ public class JdbcDao implements JdbcDaoInterface {
 		Parameter where = conditions.getWhereSql();
 		String tableName = T2E.toColumn(conditions.getObj().getClass().getSimpleName());
 		Long index = (pageNum - 1) * pageSize;
-		String sql = "SELECT " + columns + " FROM " + tableName + " WHERE 1=1 " + where.getReadySql() + " LIMIT "
-				+ index + "," + pageSize;
-		String sql4size = "SELECT COUNT(1) AS SIZE  FROM " + tableName + " WHERE 1=1 " + where.getReadySql();
+		String sql =  SQL_KEY.SELECT  + columns + SQL_KEY.FROM  + tableName +   SQL_KEY.WHERE+SQL_KEY.ONE_EQ_ONE + where.getReadySql() +  SQL_KEY.LIMIT  
+				+ index + STRING.COMMA  + pageSize;
+		String sql4size =  SQL_KEY.SELECT+SQL_KEY. COUNT + SQL_KEY. AS + SQL_KEY.SIZE+SQL_KEY. FROM  + tableName +  SQL_KEY.WHERE +SQL_KEY.ONE_EQ_ONE  + where.getReadySql();
 
 		Parameter sqlP = new Parameter();
 		sqlP.setReadySql(sql);
@@ -160,7 +163,7 @@ public class JdbcDao implements JdbcDaoInterface {
 		sizeP.setParams(where.getParams());
 
 		List<Map<String, Object>> list = jdbc.executeQueryL(sqlP);
-		Long size = (Long) jdbc.executeQueryM(sizeP).get("SIZE");
+		Long size = (Long) jdbc.executeQueryM(sizeP).get(SQL_KEY.SIZE);
 		List<?> lists = ToEntity.findEntityObject(list, conditions.getObj().getClass());
 		Pager<?> pager = new Pager<>(pageNum, pageSize, size, lists);
 		return pager;
@@ -177,9 +180,9 @@ public class JdbcDao implements JdbcDaoInterface {
 		Parameter where = cond.getParameter();
 		String tableName = T2E.toColumn(entityClass.getSimpleName());
 		Long index = (pageNum - 1) * pageSize;
-		String sql = "SELECT " + columns + " FROM " + tableName + " WHERE " + where.getReadySql() + " LIMIT " + index
-				+ "," + pageSize;
-		String sql4size = "SELECT COUNT(1) AS SIZE  FROM " + tableName + " WHERE " + where.getReadySql();
+		String sql =  SQL_KEY.SELECT  + columns +  SQL_KEY.FROM   + tableName +  SQL_KEY. WHERE  + where.getReadySql() +  SQL_KEY. LIMIT  + index
+				+ STRING.COMMA   + pageSize;
+		String sql4size = SQL_KEY.SELECT + SQL_KEY.COUNT + SQL_KEY.AS +SQL_KEY.SIZE + SQL_KEY.FROM  + tableName +  SQL_KEY. WHERE   + where.getReadySql();
 
 		Parameter sqlP = new Parameter();
 		sqlP.setReadySql(sql);
@@ -190,7 +193,7 @@ public class JdbcDao implements JdbcDaoInterface {
 		sizeP.setParams(where.getParams());
 
 		List<Map<String, Object>> list = jdbc.executeQueryL(sqlP);
-		Long size = (Long) jdbc.executeQueryM(sizeP).get("SIZE");
+		Long size = (Long) jdbc.executeQueryM(sizeP).get(SQL_KEY.SIZE);
 		List<?> lists = ToEntity.findEntityObject(list, entityClass);
 		Pager<?> pager = new Pager<>(pageNum, pageSize, size, lists);
 		return pager;
@@ -230,7 +233,7 @@ public class JdbcDao implements JdbcDaoInterface {
 
 	public Boolean saveOrUpdates(List<?> objs) {
 		List<String> sqls = new LinkedList<>();
-		String readySql = "";
+		String readySql = new String();
 		List<Map<Integer, Object>> parameters = new ArrayList<>();
 		for (Object object : objs) {
 			RObject rObj = new RObject(object);
@@ -293,12 +296,12 @@ public class JdbcDao implements JdbcDaoInterface {
 
 	}
 
-	public int delete(Object object) {
+	public Long delete(Object object) {
 		if (ToEntity.isNull(object) == false) {
-			return 0;
+			return 0L;
 		}
 		Parameter p = ComSQL.delete(object);
-		int n = new Long(jdbc.executeUpdate(p)).intValue();
+		Long n = jdbc.executeUpdate(p)  ;
 		return n;
 
 	}
@@ -317,11 +320,8 @@ public class JdbcDao implements JdbcDaoInterface {
 		Parameter p = ComSQL.getO2O(left, others);
 		// logger.debug(sql);
 		List<Map<String, Object>> list = jdbc.executeQueryL(p);
-
-		String str = "Integer Long Short Byte Float Double Character Boolean Date String List";
-
+		
 		String TClassName = left.getClass().getName();// Genericity.getGenericity(this.getClass(),
-														// 0);// 泛型T实际运行时的全类名
 
 		List<Object> resultList = new LinkedList<>();
 
@@ -332,14 +332,15 @@ public class JdbcDao implements JdbcDaoInterface {
 
 			for (Field f : fields) {
 				Object obj = m.get(T2E
-						.toField(Genericity.getSimpleName(TClassName).toUpperCase() + "_" + T2E.toColumn(f.getName())));
+						.toField(Genericity.getSimpleName(TClassName).toUpperCase() + STRING.UNDERLINE + T2E.toColumn(f.getName())));
 				if (obj != null) {
 					rObject.invokeSetMethod(f.getName(), obj);
 				}
 
 				String typeSimpleName = f.getType().getSimpleName();
 				String typeName = f.getType().getName();
-				if (!str.contains(typeSimpleName)) {
+				String baseType = JavaBaseType.map.get(typeSimpleName);
+				if ( baseType==null  ) {//不包含 Integer Long Short Byte Float Double Character Boolean Date String List
 
 					RObject rO = new RObject(typeName);
 
@@ -347,7 +348,7 @@ public class JdbcDao implements JdbcDaoInterface {
 
 					for (Field ff : fs) {
 
-						Object o = m.get(T2E.toField(typeSimpleName.toUpperCase() + "_" + T2E.toColumn(ff.getName())));
+						Object o = m.get(T2E.toField(typeSimpleName.toUpperCase() + STRING.UNDERLINE + T2E.toColumn(ff.getName())));
 						if (o != null) {
 							rO.invokeSetMethod(ff.getName(), o);
 						}
@@ -409,9 +410,28 @@ public class JdbcDao implements JdbcDaoInterface {
 
 		 
 		Map<String, Object> map = jdbc.executeQueryM(p);
-		Object obj = map.get("SIZE");
+		Object obj = map.get(SQL_KEY.SIZE);
 		return (Long) obj;
 
+	}
+     
+	@Override
+	public Long update(Object oldEntityObject, Object newEnityObject) {
+		Object old = this.get(oldEntityObject);
+		if(old != null){
+			Object key = new RObject(old).getPkValue();
+			RObject rObj = new RObject(newEnityObject);
+			rObj.setPk(key);
+			Long n = this.update(rObj.getObject());
+			if(n!=null && n ==1){
+				return 1L;
+			}else{
+				return 0L;
+			}
+		}else{
+			return 0L;
+		}
+		 
 	}
 
 	

@@ -150,7 +150,7 @@ public class Jdbc {
 
 			Statement statement = connection.createStatement();
 			for (String sql : sqls) {
-				logger.debug("【JDBC】可执行SQL  : " + Parameter.getFormatSql(sql));
+				logger.debug("【JDBC】可执行SQL:" + Parameter.getFormatSql(sql));
 				statement.addBatch(sql);
 			}
 			statement.executeBatch(); // 执行批处理
@@ -177,7 +177,7 @@ public class Jdbc {
 	 * @return 执行成功返回true;执行失败返回false.
 	 */
 	public Boolean executeUpdate( String readySql,  List<Map<Integer,Object>> parameters ) {
-		logger.debug("【JDBC】 预编译SQL: \r\t" + Parameter.getFormatSql(readySql));
+		logger.debug("【JDBC】 预编译SQL:" + Parameter.getFormatSql(readySql));
 		logger.debug("【JDBC】 预编译SQL对应的参数: " + parameters);
 		if(SqlVerification.isUpdateSql(readySql)==false){
 			logger.debug("【JDBC】SQL语句不是更新语句：" + Parameter.getFormatSql(readySql));
@@ -221,7 +221,7 @@ public class Jdbc {
 	 * @return List
 	 */
 	public List<Map<String, Object>> executeQueryL(Parameter parameter) {
-		logger.debug("【JDBC】 预编译SQL: \r\t" + parameter.getFormatSql());
+		logger.debug("【JDBC】 预编译SQL:" + parameter.getFormatSql());
 		logger.debug("【JDBC】 预编译SQL对应的参数: " + parameter.getParams());
 		if(SqlVerification.isSelectSql(parameter.getReadySql())==false){
 			logger.debug("【JDBC】SQL语句不是查询语句：" + parameter.getFormatSql());
@@ -257,7 +257,7 @@ public class Jdbc {
 			}
 			return resultList;
 		} catch (SQLException e) {
-			logger.debug("【JDBC】: SQL语句执行异常  \r\t " + parameter.getReadySql());
+			logger.debug("【JDBC】 SQL语句执行异常 :" + parameter.getReadySql());
 			//e.printStackTrace();
 			return new LinkedList<>();
 		} finally {
@@ -274,7 +274,7 @@ public class Jdbc {
 	 * @return map 记录数量不为1时返回null.
 	 */
 	public Map<String, Object> executeQueryM(Parameter parameter) {
-		logger.debug("【JDBC】 预编译SQL: \r\t" + parameter.getFormatSql());
+		logger.debug("【JDBC】 预编译SQL:" + parameter.getFormatSql());
 		logger.debug("【JDBC】 预编译SQL对应的参数: " + parameter.getParams());
 		if(SqlVerification.isSelectSql(parameter.getReadySql())==false){
 			logger.debug("【JDBC】SQL语句不是查询语句：" + parameter.getFormatSql());
@@ -295,7 +295,7 @@ public class Jdbc {
 	 * @return 返回结果集对象.
 	 */
 	public ResultMap executeQuery(Parameter parameter) {
-		logger.debug("【JDBC】 预编译SQL: \r\t" + parameter.getFormatSql());
+		logger.debug("【JDBC】 预编译SQL:" + parameter.getFormatSql());
 		logger.debug("【JDBC】 预编译SQL对应的参数: " + parameter.getParams());
 		if(SqlVerification.isSelectSql(parameter.getReadySql())==false){
 			logger.debug("【JDBC】SQL语句不是查询语句：" + parameter.getFormatSql());
@@ -321,7 +321,7 @@ public class Jdbc {
 	 */
 	public Object executeQuery(Parameter parameter, Class<?> entityClass) {
 		
-		logger.debug("【JDBC】 预编译SQL: \r\t" + parameter.getFormatSql());
+		logger.debug("【JDBC】 预编译SQL:" + parameter.getFormatSql());
 		logger.debug("【JDBC】 预编译SQL对应的参数: " + parameter.getParams());
 		if(SqlVerification.isSelectSql(parameter.getReadySql())==false){
 			logger.debug("【JDBC】SQL语句不是查询语句：" + parameter.getFormatSql());
@@ -346,7 +346,7 @@ public class Jdbc {
 	 * @return 实体对象集合
 	 */
 	public List<?> executeQuerys(Parameter parameter, Class<?> entityClass) {
-		logger.debug("【JDBC】 预编译SQL: \r\t" + parameter.getFormatSql());
+		logger.debug("【JDBC】 预编译SQL:" + parameter.getFormatSql());
 		logger.debug("【JDBC】 预编译SQL对应的参数: " + parameter.getParams());
 		if(SqlVerification.isSelectSql(parameter.getReadySql())==false){
 			logger.debug("【JDBC】SQL语句不是查询语句：" + parameter.getFormatSql());

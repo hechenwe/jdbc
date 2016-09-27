@@ -3,8 +3,11 @@ package com.sooncode.jdbc.sql.condition;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.sooncode.jdbc.constant.SQL_KEY;
+import com.sooncode.jdbc.constant.STRING;
 import com.sooncode.jdbc.sql.Parameter;
-import com.sooncode.jdbc.sql.condition.sign.NullSign;
+import com.sooncode.jdbc.sql.condition.sign.DateFormatSign;
+import com.sooncode.jdbc.sql.condition.sign.LikeSign;
 import com.sooncode.jdbc.sql.condition.sign.Sign;
 import com.sooncode.jdbc.util.T2E;
 
@@ -28,20 +31,20 @@ public class Cond {
 		String className = sign.getClass().getName();
 
 		String sql = new String();
-		if (sign.toString().contains("LIKE")) {
-			sql = T2E.toColumn(key) + " LIKE ? ";
-			if (sign.equals("LIKE")) {
-				value = "%" + value + "%";
-			} else if (sign.equals("R_LIKE")) {
-				value = "%" + value;
-			} else if (sign.equals("L_LIKE")) {
-				value = value + "%";
+		if (sign.toString().contains(SQL_KEY.LIKE)) {
+			sql = T2E.toColumn(key)+ STRING.SPACING + SQL_KEY.LIKE + STRING.SPACING + STRING.QUESTION + STRING.SPACING ;   
+			if (sign.equals(SQL_KEY.LIKE)) {
+				value = STRING.PERCENT + value +STRING.PERCENT;
+			} else if (sign.equals(LikeSign.R_LIKE)) {
+				value = STRING.PERCENT+ value;
+			} else if (sign.equals(LikeSign.L_LIKE)) {
+				value = value + STRING.PERCENT;
 			}
-		} else if ("com.sooncode.jdbc.sql.condition.sign.DateFormatSign".equals(className)) {
-			sql = " DATE_FORMAT(" + T2E.toColumn(key) + ",'" + sign + "') = ? ";
+		} else if (DateFormatSign.class.getName().equals(className)) {
+			sql = STRING.SPACING + SQL_KEY.DATE_FORMAT + SQL_KEY.L_BRACKET + T2E.toColumn(key) + STRING.COMMA + STRING.S_QUOTES  + sign + STRING.S_QUOTES +SQL_KEY.R_BRACKET + SQL_KEY.EQ +  STRING.QUESTION + STRING.SPACING ;//   "') = ? ";
 
 		} else {
-			sql = T2E.toColumn(key) + " " + sign + " ? ";
+			sql = T2E.toColumn(key) + STRING.SPACING   + sign + SQL_KEY.QUESTION ;  //" ? ";
 		}
 
 		Map<Integer, Object> param = new HashMap<>();
@@ -58,18 +61,18 @@ public class Cond {
      * @param value 条件对应的值集合
      */
 	public Cond(String key, Object[] values) {
-			String in = "( ";
+			String in = SQL_KEY.L_BRACKET ;//"( " ;
 			Map<Integer, Object> param = new HashMap<>();
 			for (int i = 1; i <= values.length; i++) {
 				param.put(i, values[i - 1]);
 				if (i == 1) {
-					in = in + " ? ";
+					in = in + SQL_KEY.QUESTION ;//" ? ";
 				} else {
-					in = in + " ,? ";
+					in = in + STRING.SPACING + STRING.COMMA + STRING.QUESTION + STRING.SPACING ;//" ,? ";
 				}
 			}
-			in = in + " )";
-			String sql = T2E.toColumn(key) + " IN " + in;
+			in = in + SQL_KEY.R_BRACKET;//" )";
+			String sql = T2E.toColumn(key) + SQL_KEY.IN  + in;
 			this.parameter = new Parameter();
 			this.parameter.setReadySql(sql);
 			this.parameter.setParams(param);
@@ -81,7 +84,7 @@ public class Cond {
 	 */
 	public Cond(String key, Sign NullSign) {
 		    
-			String sql = T2E.toColumn(key) +" " +NullSign;
+			String sql = T2E.toColumn(key) +STRING.SPACING +NullSign;
 			this.parameter = new Parameter();
 			this.parameter.setReadySql(sql);
 	}
@@ -92,7 +95,7 @@ public class Cond {
      * @param endObject 结束值
      */
 	public Cond(String key,Object start ,Object end ){
-		String sql = T2E.toColumn(key) +" BETWEEN ? AND ?";
+		String sql = T2E.toColumn(key) + SQL_KEY.BETWEEN + STRING.QUESTION + SQL_KEY.AND + STRING.QUESTION ;// " BETWEEN ? AND ?";
 		Map<Integer, Object> param = new HashMap<>();
 		param.put(1, start );
 		param.put(2, end );
@@ -150,16 +153,16 @@ public class Cond {
 	 */
 	public Cond orderBy(OrderBy ... orderBies){
 		
-		String orderBy = " ORDER BY ";
+		String orderBy = SQL_KEY.ORDER_BY ;//" ORDER BY ";
 		for (int i = 0; i < orderBies.length; i++) {
 			if(i==0){
-				orderBy = orderBy +" "+ orderBies[i];
+				orderBy = orderBy +STRING.SPACING + orderBies[i];
 			}else{
-				orderBy = orderBy+" , " + orderBies[i];
+				orderBy = orderBy+ SQL_KEY.COMMA  + orderBies[i];
 			}
 		}
 		
-		this.parameter.setReadySql(this.parameter.getReadySql()+ " " +orderBy);
+		this.parameter.setReadySql(this.parameter.getReadySql()+ STRING.SPACING  +orderBy);
 		return this;
 		
 	}

@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.sooncode.jdbc.constant.SQL_KEY;
+import com.sooncode.jdbc.constant.STRING;
 import com.sooncode.jdbc.reflect.RObject;
 import com.sooncode.jdbc.sql.Parameter;
 import com.sooncode.jdbc.sql.condition.sign.Sign;
@@ -27,7 +29,7 @@ public class Conditions {
 	/**
 	 * 排序的SQL片段
 	 */
-	private String oderByes = "";
+	private String oderByes =new String();
 
 	public Conditions(Object obj) {
 		this.obj = obj;
@@ -57,7 +59,7 @@ public class Conditions {
 
 		Condition c = ces.get(key);
 		if (c != null) {
-			c.setConditionSign(sign+"");
+			c.setConditionSign(sign+new String());
 			ces.put(c.getKey(), c);
 		}
 		return this;
@@ -80,7 +82,7 @@ public class Conditions {
 			if (obj != null) {
 				c.setVal(obj);
 			}
-			c.setConditionSign(sign+"");
+			c.setConditionSign(sign+new String());
 			ces.put(c.getKey(), c);
 		}
 		return this;
@@ -102,7 +104,7 @@ public class Conditions {
 		Condition c = ces.get(key);
 		c.setType("0");
 		if (c != null) {
-			String sql = " " + T2E.toColumn(key) + " BETWEEN " + start + " AND " + end + " ";
+			String sql = STRING.SPACING  + T2E.toColumn(key) + SQL_KEY.BETWEEN  + start + SQL_KEY.AND  + end + STRING.SPACING;
 			c.setCondition(sql);
 			ces.put(c.getKey(), c);
 		}
@@ -120,7 +122,7 @@ public class Conditions {
 		Condition c = ces.get(key);
 		c.setType("0");
 		if (c != null) {
-			String sql = " " + T2E.toColumn(key) + " IS NULL ";
+			String sql = STRING.SPACING + T2E.toColumn(key) + SQL_KEY.IS+SQL_KEY.NULL + STRING.SPACING;//" IS NULL ";
 			c.setCondition(sql);
 			ces.put(c.getKey(), c);
 		}
@@ -138,7 +140,7 @@ public class Conditions {
 		Condition c = ces.get(key);
 		c.setType("0");
 		if (c != null) {
-			String sql = " " + T2E.toColumn(key) + " IS NOT NULL ";
+			String sql = STRING.SPACING + T2E.toColumn(key) +  SQL_KEY.IS + SQL_KEY.NOT + SQL_KEY.NULL+ STRING.SPACING ;//" IS NOT NULL ";
 			c.setCondition(sql);
 			ces.put(c.getKey(), c);
 		}
@@ -179,10 +181,10 @@ public class Conditions {
 			return this;
 		} else {
 			if (this.oderByes.equals("")) {
-				this.oderByes = this.oderByes + " " + key.toUpperCase() + " " + sort.name();
+				this.oderByes = this.oderByes + STRING.SPACING + key.toUpperCase() + STRING.SPACING + sort.name();
 
 			} else {
-				this.oderByes = this.oderByes + " , " + key.toUpperCase() + " " + sort.name();
+				this.oderByes = this.oderByes + SQL_KEY.COMMA  + key.toUpperCase() + STRING.SPACING + sort.name();
 			}
 		}
 
@@ -207,42 +209,42 @@ public class Conditions {
 				if (c.getVal() != null || c.getVales()!=null) {
 					String sign = c.getConditionSign();
 					String newSign = sign ;//Sign.Signmap.get(sign);
-					newSign = newSign == null ? " = " : newSign; //如果字段不为空，但是没有条件符号，默认使用等值查询"="。
-					if (newSign.equals("LIKE")) {
-						sql = sql + " AND " + con + " LIKE ?";// + c.getVal() + "%'";
-						para.put(index,"%"+c.getVal()+"%");
+					newSign = newSign == null ? SQL_KEY.EQ  : newSign; //如果字段不为空，但是没有条件符号，默认使用等值查询"="。
+					if (newSign.equals(SQL_KEY.LIKE)) {
+						sql = sql + SQL_KEY.AND + con + SQL_KEY.LIKE +STRING.SPACING + STRING.QUESTION ;// " AND LIKE ?"; 
+						para.put(index,STRING.PERCENT +c.getVal()+STRING.PERCENT);
 						index++;
-					} else if(sign!=null && sign.equals("IN")){
+					} else if(sign!=null && sign.equals(SQL_KEY.IN)){
 						
-						String vales = "(";
+						String vales = SQL_KEY.L_BRACKET ;// "(";
 						for (int i = 0;i<c.getVales().length ;i++) {
 							if(i!=0){
-								vales = vales + " ,? ";
+								vales = vales + STRING.SPACING + STRING.COMMA + STRING.QUESTION + STRING.SPACING ;//  " ,? ";
 								
 							}else{
-							    vales = vales + "? ";
+							    vales = vales   + STRING.QUESTION + STRING.SPACING ;//"? ";
 							}
 							para.put(index,c.getVales()[i]);
 							index++;
 						}
-						vales=vales+") ";
-						sql = sql +" AND " + con + " IN " +vales;
+						vales=vales+ SQL_KEY.R_BRACKET + STRING.SPACING ;//  ") ";
+						sql = sql +SQL_KEY.AND  + con + SQL_KEY.IN  +vales;
 					}
 					
 					else {
-						sql = sql + " AND " + con + " " + newSign + "?";
+						sql = sql + SQL_KEY.AND   + con + STRING.SPACING +  newSign + STRING.QUESTION ;//"?";
 						para.put(index,c.getVal());
 						index++;
 					}
 				}
 			}else{//自定义 
-				sql = sql +" AND " + c.getCondition();
+				sql = sql + SQL_KEY.AND  + c.getCondition();
 			}
 			
 			
 		}
 		if (!this.oderByes.equals("")) {
-			sql = sql + " ORDER BY " + this.oderByes;
+			sql = sql + SQL_KEY.ORDER_BY  + this.oderByes;
 		}
 		p.setReadySql(sql);
 		p.setParams(para);

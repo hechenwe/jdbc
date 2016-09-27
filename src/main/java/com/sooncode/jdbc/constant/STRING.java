@@ -49,5 +49,13 @@ public static final String R_T ="\r\t";
  * 单引号 "'"
  */
 public static final String S_QUOTES ="'";
+/**
+ * 逗号 ","
+ */
+public static final String COMMA = ",";
+/**
+ * 百分号 "%"
+ */
+public static final String  PERCENT = "%";
 
 }
