@@ -106,7 +106,7 @@ public interface JdbcDaoInterface {
 	/**
 	 * 修改一个实体对象
 	 * 
-	 * @param object
+	 * @param entityObject 需要更新的实体（主键对应的属性值不为空（null））
 	 * @return 更新数量
 	 */
 	public Long update(Object entityObject)  ;

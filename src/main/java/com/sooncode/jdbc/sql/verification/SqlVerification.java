@@ -1,5 +1,7 @@
 package com.sooncode.jdbc.sql.verification;
 
+import com.sooncode.jdbc.constant.STRING;
+
 /**
  * SQL 验证
  * 
@@ -7,10 +9,10 @@ package com.sooncode.jdbc.sql.verification;
  *
  */
 public class SqlVerification {
-	private static final String SELECT = "SELECT ";
-	private static final String UPDATE = "UPDATE ";
-	private static final String DELETE = "DELETE ";
-	private static final String INSERT = "INSERT ";
+	private static final String SELECT = "SELECT"+STRING.SPACING;
+	private static final String UPDATE = "UPDATE"+STRING.SPACING;
+	private static final String DELETE = "DELETE"+STRING.SPACING;
+	private static final String INSERT = "INSERT"+STRING.SPACING;
     /**
      * 是否是查询语句
      * @param sql SQL语句

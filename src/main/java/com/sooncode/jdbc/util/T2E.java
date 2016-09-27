@@ -3,6 +3,8 @@ package com.sooncode.jdbc.util;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.sooncode.jdbc.constant.STRING;
+
  
 
 /**
@@ -39,7 +41,7 @@ public class T2E {
 				i++;
 			}
 			if (i != 0) {
-				string = string + sb.toString().toUpperCase() + "_";
+				string = string + sb.toString().toUpperCase() + STRING.UNDERLINE;
 			}
 			if (i < field.length()) {
 				sb = new StringBuilder();
@@ -65,7 +67,7 @@ public class T2E {
 			return field;
 		}
 
-		String[] arrays = columnName.toLowerCase().split("_");
+		String[] arrays = columnName.toLowerCase().split(STRING.UNDERLINE);
 		field = new  String ();
 		if (arrays.length > 0) {
 			field = arrays[0];

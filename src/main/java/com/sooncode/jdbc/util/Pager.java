@@ -1,6 +1,7 @@
 package com.sooncode.jdbc.util;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -45,8 +46,22 @@ public class Pager <T> {
 	//--------------------------------------------- 构造器 ----------------------------------------------------------------
 
 	public Pager(Long pageNumber, Long pageSize, Long total, List<T> lists) {
+		if(pageNumber==null){
+			pageNumber = 1L;
+		}
+		if(pageSize==null){
+			pageNumber = 10L;
+		}
+		if(total==null){
+			pageNumber = 0L;
+		}
+		 
 		init( total ,pageNumber, pageSize);
-		this.lists = lists;
+		if(lists==null ){
+			this.lists = new ArrayList<>();
+		}else{
+			this.lists = lists;
+		}
 	}
 	
 	public Pager(Long pageNumber, Long pageSize, Long total, T entity) {
@@ -59,7 +74,11 @@ public class Pager <T> {
 		// 设置基本参数
 		this.total = total;
 		this.pageSize = pageSize;
-		this.totalPages = (this.total - 1) / this.pageSize + 1;
+		if(total==0L){
+			this.totalPages= 0L;	
+		}else{
+			this.totalPages = (this.total - 1) / this.pageSize + 1;
+		}
 
 		// 根据输入可能错误的当前号码进行自动纠正
 		if (pageNumber < 1) {

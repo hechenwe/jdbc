@@ -22,7 +22,9 @@ class ParaXml {
 	private String xmlString;
 
 	private Document document;
-
+    private static final String SQLS = "sqls";
+    private static final String TEXT = "#text";
+    private static final String ID = "id";
 	public ParaXml(String xmlString) {
 		this.xmlString = xmlString;
 
@@ -41,7 +43,7 @@ class ParaXml {
 	
 	public  String getValue(String id) {
 		
-		NodeList root = document.getElementsByTagName("sqls");
+		NodeList root = document.getElementsByTagName(SQLS);
 		 
 		Node node = root.item(0); // NodeList中的某一个节点
 		NodeList list =node.getChildNodes();
@@ -49,10 +51,10 @@ class ParaXml {
 		for(int i = 0;i<list.getLength();i++){
 			
 			    String ke = list.item(i).getNodeName();
-			    if( ! ke.equals("#text")){
+			    if( ! ke.equals(TEXT)){
 			    	
 			    	Element element = (Element) list.item(i); 
-			    	String thisId = element.getAttribute("id");
+			    	String thisId = element.getAttribute(ID);
 			    	if(id.equals(thisId)){
 			    		String value =  list.item(i).getTextContent();
 			    		return value;
@@ -63,7 +65,7 @@ class ParaXml {
 	}
 	public  String getValue(String id,Object... objes) {
 		
-		NodeList root = document.getElementsByTagName("sqls");
+		NodeList root = document.getElementsByTagName(SQLS);
 		
 		Node node = root.item(0); // NodeList中的某一个节点
 		NodeList list =node.getChildNodes();
@@ -71,10 +73,10 @@ class ParaXml {
 		for(int i = 0;i<list.getLength();i++){
 			
 			String ke = list.item(i).getNodeName();
-			if( ! ke.equals("#text")){
+			if( ! ke.equals(TEXT)){
 				
 				Element element = (Element) list.item(i); 
-				String thisId = element.getAttribute("id");
+				String thisId = element.getAttribute(ID);
 				if(id.equals(thisId)){
 					String value =  list.item(i).getTextContent();
 					

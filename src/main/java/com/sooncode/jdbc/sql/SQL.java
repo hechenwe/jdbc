@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.sooncode.jdbc.constant.STRING;
 import com.sooncode.jdbc.reflect.RObject;
 import com.sooncode.jdbc.sql.condition.Cond;
 import com.sooncode.jdbc.util.T2E;
@@ -17,7 +18,7 @@ import com.sooncode.jdbc.util.T2E;
 public class SQL {
 
 	/** 预编译SQL */
-	private String readySql = "";
+	private String readySql = STRING.NULL_STR;
 
 	/** 参数 ，从1开始 */
 	private Map<Integer, Object> params = new HashMap<>();

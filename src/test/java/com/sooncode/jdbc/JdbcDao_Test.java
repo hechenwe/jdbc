@@ -1,7 +1,7 @@
 package com.sooncode.jdbc;
 
 import java.util.ArrayList;
-
+import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -57,6 +57,9 @@ public class JdbcDao_Test {
 		User u = new User ();
 		u.setId(1072);
 		u.setName("ni mei");
+		u.setAge(234);
+		u.setCreateDate(new Date());
+		u.setField1("LSDJFSDKHLS");
 		Long n = jdbcDao.update(u);
 		logger.info(n);
 	}

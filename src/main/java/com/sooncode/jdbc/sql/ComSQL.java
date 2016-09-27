@@ -117,28 +117,25 @@ public class ComSQL {
 		String tableName = T2E.toColumn(object.getClass().getSimpleName());
 		Map<String, Object> map = new RObject(object).getFiledAndValue();
 		RObject rObject = new RObject(object);
-		int n = 0;
+		 
 		String s = new String();
 		String pk = T2E.toColumn(rObject.getPk());
 		
 		String pkString = pk + SQL_KEY.EQ + STRING.QUESTION ; 
+		s = s+ pkString;
 		Map<Integer,Object> param = new HashMap<>();
-		
-		int index=1;
+		param.put(1, rObject.getPkValue());
+		int index=2;
 		for (Entry<String, Object> entry : map.entrySet()) {
 			
 			if (entry.getValue() != null && !entry.getKey().trim().equals(rObject.getPk().trim())) {
-				if (n != 0) {
-					s = s + SQL_KEY.COMMA;
-				}
-				s = s + T2E.toColumn(entry.getKey())  + SQL_KEY.EQ + STRING.QUESTION ;
+				 
+				s = s +SQL_KEY.COMMA + T2E.toColumn(entry.getKey())  + SQL_KEY.EQ + STRING.QUESTION ;
 				param.put(index,entry.getValue());
 				index++;
-				n++;
 			}
 		}
 		param.put(param.size()+1, rObject.getPkValue());
-		
 		String sql = SQL_KEY.UPDATE + tableName + SQL_KEY.SET  + s + SQL_KEY.WHERE + pkString;
 		p.setReadySql(sql);
 		p.setParams(param);

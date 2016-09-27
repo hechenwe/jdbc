@@ -251,7 +251,7 @@ public class JdbcDao implements JdbcDaoInterface {
 			}
 		}
 
-		if (readySql.equals("") && sqls.size() > 0) {
+		if (readySql.equals(STRING.NULL_STR) && sqls.size() > 0) {
 			return jdbc.executeUpdates(sqls);
 		} else if (parameters.size() > 0) {
 			return jdbc.executeUpdate(readySql, parameters);
@@ -288,6 +288,10 @@ public class JdbcDao implements JdbcDaoInterface {
 
 	public Long update(Object object) {
 		if (ToEntity.isNull(object) == false) {
+			return 0L;
+		}
+		Object pkValue = new RObject(object).getPkValue();
+		if(pkValue == null) {
 			return 0L;
 		}
 		Parameter p = ComSQL.update(object);

@@ -2,6 +2,8 @@ package com.sooncode.jdbc;
 
 import java.util.Hashtable;
 
+import com.sooncode.jdbc.constant.DATA;
+
 public class JdbcFactory {
 
 	public static Hashtable<String,Jdbc> jdbcs = new Hashtable<>();
@@ -9,10 +11,10 @@ public class JdbcFactory {
 	private JdbcFactory(){}
 	
 	public static Jdbc getJdbc(){
-		Jdbc jdbc = jdbcs.get("default");
+		Jdbc jdbc = jdbcs.get(DATA.DEFAULT_KEY);
 		if(jdbc==null){
 			jdbc = new Jdbc();
-			jdbcs.put("default", jdbc);
+			jdbcs.put(DATA.DEFAULT_KEY, jdbc);
 		}
 		return jdbc;
 	}

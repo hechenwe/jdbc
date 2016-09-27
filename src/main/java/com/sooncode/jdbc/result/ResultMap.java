@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.sooncode.jdbc.constant.STRING;
 import com.sooncode.jdbc.util.T2E;
 
 /**
@@ -31,17 +32,17 @@ public class ResultMap {
 	 * @return 字段对应的值 
 	 */
 	public Object get(String key){
-		   if(key==null || key.trim().equals("")){
+		   if(key==null || key.trim().equals(STRING.NULL_STR)){
 			   return null;
 		   }
 		   StringBuffer str = new StringBuffer(key);
-		   int n = str.indexOf(".");
+		   int n = str.indexOf(STRING.POINT);
 		   if(n!=-1){
-			   String[] strs = str.toString().split("\\.");
+			   String[] strs = str.toString().split(STRING.ESCAPE_POINT);
 			   if(strs.length==2){
 			   String tableName = T2E.toColumn(strs[0]);
 			   String conName = T2E.toColumn(strs[1]);
-			   key = tableName+"_"+conName;
+			   key = tableName+STRING.UNDERLINE+conName;
 			   }else{
 				   return null;
 			   }

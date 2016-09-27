@@ -66,7 +66,8 @@ public class Parameter {
 		String sql = new String ( readySql);
 		sql = sql .replace(SQL_KEY.SELECT, STRING.R_T+SQL_KEY.SELECT+STRING.R_T);
 		sql = sql .replace(SQL_KEY.INSERT, STRING.R_T+SQL_KEY.INSERT);
-		sql = sql .replace(SQL_KEY.UPDATE, STRING.R_T+SQL_KEY.UPDATE+STRING.R_T);
+		sql = sql .replace(SQL_KEY.SET, STRING.R_T+"SET ");
+		sql = sql .replace(SQL_KEY.UPDATE, STRING.R_T+SQL_KEY.UPDATE);
 		sql = sql .replace(SQL_KEY.DELETE, STRING.R_T+SQL_KEY.DELETE+STRING.R_T);
 		sql = sql .replace(SQL_KEY.COMMA, SQL_KEY.COMMA+STRING.R_T);
 		sql = sql .replace(SQL_KEY.FROM,STRING.R_T+ "FROM ");
@@ -105,7 +106,7 @@ public class Parameter {
 	 */
 	public boolean isNotException(){
 		
-		if(this.readySql == null || this.readySql.trim().equals("")){
+		if(this.readySql == null || this.readySql.trim().equals(STRING.NULL_STR)){
 			return false;
 		}else{
 			StringBuilder sql = new StringBuilder(this.readySql);

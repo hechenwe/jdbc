@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.sooncode.jdbc.constant.STRING;
 import com.sooncode.jdbc.sql.ParaInject;
 import com.sooncode.jdbc.sql.Parameter;
 
@@ -44,11 +45,11 @@ public class SqlXml {
 	 * @return 压缩后的字符串
 	 */
 	private static String compressString(String str) {
-		String temp = "";
+		String temp = STRING.NULL_STR;
 		if (str != null) {
 			Pattern p = Pattern.compile("\t|\r|\n");
 			Matcher m = p.matcher(str);
-			temp = m.replaceAll("");
+			temp = m.replaceAll( STRING.NULL_STR);
 		}
 		return temp;
 	}
@@ -116,7 +117,7 @@ public class SqlXml {
 			String temp = null;
 			temp = br.readLine();
 			while (temp != null) {
-				sb.append(temp + " ");
+				sb.append(temp + STRING.SPACING);
 				temp = br.readLine();
 			}
 		} catch (Exception e) {

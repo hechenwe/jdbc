@@ -85,7 +85,12 @@ public static final String S_NULL = "null";
  * "@"
  */
 public static final String AT = "@";
-
-
-
+/**
+ * 空字符串 ""
+ */
+public static final String NULL_STR = "";
+/**
+ * 转义  "\\."
+ */
+public static final String ESCAPE_POINT="\\.";
 }

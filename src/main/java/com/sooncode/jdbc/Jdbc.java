@@ -20,6 +20,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
+
+import com.sooncode.jdbc.constant.DATE_FORMAT;
+import com.sooncode.jdbc.constant.STRING;
 import com.sooncode.jdbc.db.DBs;
 import com.sooncode.jdbc.result.ResultMap;
 import com.sooncode.jdbc.sql.Parameter;
@@ -376,7 +379,7 @@ public class Jdbc {
 		logger.debug("【JDBC】:存储过程 SQL  " + sql);
 		Connection connection = DBs.getConnection(this.dbKey);
 		// sql 中参数的个数
-		int n = countParameter(sql, "?");
+		int n = countParameter(sql, STRING.QUESTION);
 		// 创建调用存储过程的预定义SQL语句
 
 		CallableStatement callableStatement = null;
@@ -496,7 +499,7 @@ public class Jdbc {
 			}
 
 			if (className.equals("java.util.Date")) {
-				String d = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(obj);
+				String d = new SimpleDateFormat(DATE_FORMAT.ALL_DATE).format(obj);
 				preparedStatement.setString(index, d);
 			}
 
