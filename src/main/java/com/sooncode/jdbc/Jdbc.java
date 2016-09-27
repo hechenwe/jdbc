@@ -21,6 +21,7 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 
+import com.sooncode.jdbc.constant.DATA;
 import com.sooncode.jdbc.constant.DATE_FORMAT;
 import com.sooncode.jdbc.constant.STRING;
 import com.sooncode.jdbc.db.DBs;
@@ -48,7 +49,7 @@ public class Jdbc {
 	/**
 	 * 数据库资源Key 默认是：default 关键字； 代表一组数据库连接参数
 	 */
-	private String dbKey = "default";
+	private String dbKey = DATA.DEFAULT_KEY;
 
 	
 	
@@ -59,7 +60,7 @@ public class Jdbc {
 	 *            
 	 */
 	Jdbc(String dbKey) {
-		if(dbKey!=null && !dbKey.trim().equals("")){
+		if(dbKey!=null && !dbKey.trim().equals(STRING.NULL_STR)){
 			this.dbKey = dbKey;
 		}
 
