@@ -3,6 +3,9 @@ package com.sooncode.jdbc.sql;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.sooncode.jdbc.constant.SQL_KEY;
+import com.sooncode.jdbc.constant.STRING;
+
 /**
  * 参数模型
  * 
@@ -24,6 +27,8 @@ public class Parameter {
 
 	/** 预编译SQL */
 	private String readySql;
+	 
+	
 	/** 参数 ，从1开始 */
 	private Map<Integer, Object> params = new HashMap<>();
 
@@ -43,6 +48,46 @@ public class Parameter {
 		this.params = params;
 	}
 
+	/**
+	 * 获取 格式之后的SQL语句
+	 * @return
+	 */
+	public String getFormatSql() {
+		
+		String sql = new String ( this.getReadySql());
+		sql = sql .replace(SQL_KEY.SELECT, SQL_KEY.SELECT+STRING.R_T);
+		sql = sql .replace(SQL_KEY.INSERT, STRING.R_T+SQL_KEY.INSERT);
+		sql = sql .replace(SQL_KEY.UPDATE, SQL_KEY.UPDATE+STRING.R_T);
+		sql = sql .replace(SQL_KEY.DELETE, SQL_KEY.DELETE+STRING.R_T);
+		sql = sql .replace(SQL_KEY.COMMA, SQL_KEY.COMMA+STRING.R_T);
+		sql = sql .replace(SQL_KEY.FROM,STRING.R_T+ "FROM ");
+		sql = sql .replace(SQL_KEY.WHERE, STRING.R_T+"WHERE ");
+		sql = sql .replace(SQL_KEY.AND, STRING.R_T+"AND ");
+		sql = sql .replace(SQL_KEY.L_BRACKET,STRING.R_T+ SQL_KEY.L_BRACKET);
+		sql = sql .replace(SQL_KEY.VALUES,STRING.R_T+ "VALUES");
+		sql = sql .replace(STRING.SPACING+STRING.SPACING,STRING.SPACING);
+		return sql ;
+	}
+	
+	
+	/**
+	 * 获取 格式之后的SQL语句
+	 * @return
+	 */
+	public static String getFormatSql(String readySql) {
+		String sql = new String ( readySql);
+		sql = sql .replace(SQL_KEY.SELECT, SQL_KEY.SELECT+STRING.R_T);
+		sql = sql .replace(SQL_KEY.INSERT, SQL_KEY.INSERT+STRING.R_T);
+		sql = sql .replace(SQL_KEY.UPDATE, SQL_KEY.UPDATE+STRING.R_T);
+		sql = sql .replace(SQL_KEY.DELETE, SQL_KEY.DELETE+STRING.R_T);
+		sql = sql .replace(SQL_KEY.COMMA, SQL_KEY.COMMA+STRING.R_T);
+		sql = sql .replace(SQL_KEY.FROM,STRING.R_T+ "FROM ");
+		sql = sql .replace(SQL_KEY.WHERE, STRING.R_T+"WHERE ");
+		sql = sql .replace(SQL_KEY.AND, STRING.R_T+"AND ");
+		sql = sql .replace(SQL_KEY.LIMIT, STRING.R_T+"LIMIT ");
+		return sql ;
+	}
+	 
 	/**
 	 * 获取参数注入后的SQL语句。</br>
 	 * 注意：该SQL不一定能直接远行！

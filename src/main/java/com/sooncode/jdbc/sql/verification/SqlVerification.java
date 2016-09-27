@@ -11,7 +11,11 @@ public class SqlVerification {
 	private static final String UPDATE = "UPDATE ";
 	private static final String DELETE = "DELETE ";
 	private static final String INSERT = "INSERT ";
-
+    /**
+     * 是否是查询语句
+     * @param sql SQL语句
+     * @return true ; false
+     */
 	public static boolean isSelectSql(String sql) {
 		if (sql != null) {
 			sql = sql.trim().toUpperCase();
@@ -25,7 +29,11 @@ public class SqlVerification {
 		}
 		return false;
 	}
-
+    /**
+     * 是否是更新语句
+     * @param sql SQL语句
+     * @return true ; false
+     */
 	public static boolean isUpdateSql(String sql) {
 		if (sql != null) {
 			sql = sql.trim().toUpperCase();
@@ -47,7 +55,7 @@ public class SqlVerification {
 				}
 			}
 		}
-		int i = Integer.MAX_VALUE;
+	 
 		return false;
 	}
 }

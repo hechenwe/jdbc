@@ -198,7 +198,7 @@ public class JdbcDao implements JdbcDaoInterface {
 
 	public Long save(Object object) {
 		// 验证obj
-		if (isNull(object) == false) {
+		if (ToEntity.isNull(object) == false) {
 			return null;
 		}
 		Parameter p = ComSQL.insert(object);
@@ -214,7 +214,7 @@ public class JdbcDao implements JdbcDaoInterface {
 		}
 
 		for (Object obj : objs) {
-			if (isNull(obj) == false) {
+			if (ToEntity.isNull(obj) == false) {
 				return false;
 			}
 		}
@@ -251,7 +251,7 @@ public class JdbcDao implements JdbcDaoInterface {
 		if (readySql.equals("") && sqls.size() > 0) {
 			return jdbc.executeUpdates(sqls);
 		} else if (parameters.size() > 0) {
-			return jdbc.executeUpdates(readySql, parameters);
+			return jdbc.executeUpdate(readySql, parameters);
 		} else {
 			return false;
 		}
@@ -284,7 +284,7 @@ public class JdbcDao implements JdbcDaoInterface {
 	}
 
 	public Long update(Object object) {
-		if (isNull(object) == false) {
+		if (ToEntity.isNull(object) == false) {
 			return 0L;
 		}
 		Parameter p = ComSQL.update(object);
@@ -294,7 +294,7 @@ public class JdbcDao implements JdbcDaoInterface {
 	}
 
 	public int delete(Object object) {
-		if (isNull(object) == false) {
+		if (ToEntity.isNull(object) == false) {
 			return 0;
 		}
 		Parameter p = ComSQL.delete(object);
@@ -303,35 +303,7 @@ public class JdbcDao implements JdbcDaoInterface {
 
 	}
 
-	/**
-	 * 验证 object是否为空 或 其属性是否全为空
-	 * 
-	 * @param object 被验证的实体对象
-	 *            
-	 * @return object为空返回 false ; object中的所有属性对应的值为空返回false.
-	 */
-	private boolean isNull(Object object) {
-		if (object == null) {
-			return false;
-		}
-		// obj的属性值不全为null
-		RObject rObj = new RObject(object);
-		Map<String, Object> files = rObj.getFiledAndValue();
-		boolean b = false;
-		for (Map.Entry<String, Object> en : files.entrySet()) {
-			if (en.getValue() == null) {
-				b = b || false;
-			} else {
-				b = b || true;
-			}
-		}
-
-		if (b == false) {
-			return false;
-		} else {
-			return true;
-		}
-	}
+	
 
 	/**
 	 * 
@@ -437,7 +409,7 @@ public class JdbcDao implements JdbcDaoInterface {
 
 		 
 		Map<String, Object> map = jdbc.executeQueryM(p);
-		Object obj = map.get("size");
+		Object obj = map.get("SIZE");
 		return (Long) obj;
 
 	}

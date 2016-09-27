@@ -85,8 +85,21 @@ public class Cond {
 			this.parameter = new Parameter();
 			this.parameter.setReadySql(sql);
 	}
-
-	 
+    /**
+     * 创建 BETWEEN AND 条件
+     * @param key 属性名称（对应数据库表的字段）
+     * @param startObject 开始值
+     * @param endObject 结束值
+     */
+	public Cond(String key,Object start ,Object end ){
+		String sql = T2E.toColumn(key) +" BETWEEN ? AND ?";
+		Map<Integer, Object> param = new HashMap<>();
+		param.put(1, start );
+		param.put(2, end );
+		this.parameter = new Parameter();
+		this.parameter.setReadySql(sql);
+		this.parameter.setParams(param);
+	}
 	
 	public And and(Cond A) {
 		return new And(this, A);

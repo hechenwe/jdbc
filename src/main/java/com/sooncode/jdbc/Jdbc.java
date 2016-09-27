@@ -23,6 +23,7 @@ import org.apache.log4j.Logger;
 import com.sooncode.jdbc.db.DBs;
 import com.sooncode.jdbc.result.ResultMap;
 import com.sooncode.jdbc.sql.Parameter;
+import com.sooncode.jdbc.sql.verification.SqlVerification;
  
 
 /**
@@ -84,13 +85,22 @@ public class Jdbc {
 	 * @return 一般情况是返回受影响的行数,当有主键为自增字段,在添加数据时返回 自增值。当执行出现异常时放回null.
 	 */
 	public Long executeUpdate(Parameter p) {
+		if(p==null){
+			return null;
+		}
+		
 		if(p.isNotException()==false){
 			logger.debug("【JDBC】:预编译SQL和参数出现异常！");
 			return null;
 		}
 		String sql = p.getReadySql();
-		logger.debug("【JDBC】 预编译SQL: " + sql);
+		logger.debug("【JDBC】 预编译SQL: " + p.getFormatSql());
 		logger.debug("【JDBC】 预编译SQL对应的参数: " + p.getParams());
+		if(SqlVerification.isUpdateSql(sql)==false){
+			logger.debug("【JDBC】SQL语句不是更新语句：" + p.getFormatSql());
+			return null;
+		}
+		
 		Connection connection = DBs.getConnection(this.dbKey);
 		PreparedStatement preparedStatement = null;
 		ResultSet resultSet = null;
@@ -111,7 +121,7 @@ public class Jdbc {
 				return n;
 			}
 		} catch (SQLException e) {
-			logger.debug("【JDBC】 SQL语句执行异常 : " + sql);
+			logger.debug("【JDBC】 SQL语句执行异常 : " + p.getFormatSql());
 			return null;
 		} finally {
 			DBs.close(resultSet, preparedStatement, connection);
@@ -126,8 +136,13 @@ public class Jdbc {
 	 * @return 成功返回true ,失败返回 false.
 	 */
 	public Boolean executeUpdates(List<String> sqls) {
-		
-		
+		for (String sql : sqls) {
+			if(SqlVerification.isUpdateSql(sql)==false){
+				logger.debug("【JDBC】SQL语句不是更新语句：" + Parameter.getFormatSql(sql));
+				return false;
+			}
+			
+		}
 
 		Connection connection = DBs.getConnection(this.dbKey);
 		try {
@@ -135,7 +150,7 @@ public class Jdbc {
 
 			Statement statement = connection.createStatement();
 			for (String sql : sqls) {
-				logger.debug("【JDBC】可执行SQL  : " + sql);
+				logger.debug("【JDBC】可执行SQL  : " + Parameter.getFormatSql(sql));
 				statement.addBatch(sql);
 			}
 			statement.executeBatch(); // 执行批处理
@@ -156,16 +171,18 @@ public class Jdbc {
 	
 	
 	/**
-	 * 批量执行更新语句（动态SQL语句）
-	 * 可防止SQL注入，推荐使用。
-	 * @param sqls
-	 *            可执行更新SQL语句集
-	 * @return 成功返回true ,失败返回 false.
+	 * 执行更新语句
+	 * @param readySql 预编译SQL
+	 * @param parameters 预编译SQL需要的参数
+	 * @return 执行成功返回true;执行失败返回false.
 	 */
-	public Boolean executeUpdates( String readySql,  List<Map<Integer,Object>> parameters ) {
-		logger.debug("【JDBC】 预编译SQL: \r\t" + readySql);
+	public Boolean executeUpdate( String readySql,  List<Map<Integer,Object>> parameters ) {
+		logger.debug("【JDBC】 预编译SQL: \r\t" + Parameter.getFormatSql(readySql));
 		logger.debug("【JDBC】 预编译SQL对应的参数: " + parameters);
-		 
+		if(SqlVerification.isUpdateSql(readySql)==false){
+			logger.debug("【JDBC】SQL语句不是更新语句：" + Parameter.getFormatSql(readySql));
+			return false;
+		}
 		Connection connection = DBs.getConnection(this.dbKey);
 		try {
 			connection.setAutoCommit(false);
@@ -204,9 +221,12 @@ public class Jdbc {
 	 * @return List
 	 */
 	public List<Map<String, Object>> executeQueryL(Parameter parameter) {
-		logger.debug("【JDBC】 预编译SQL: \r\t" + parameter.getReadySql());
+		logger.debug("【JDBC】 预编译SQL: \r\t" + parameter.getFormatSql());
 		logger.debug("【JDBC】 预编译SQL对应的参数: " + parameter.getParams());
-		 
+		if(SqlVerification.isSelectSql(parameter.getReadySql())==false){
+			logger.debug("【JDBC】SQL语句不是查询语句：" + parameter.getFormatSql());
+			return new LinkedList<>();
+		} 
 		Connection connection = DBs.getConnection(this.dbKey);
 		List<Map<String, Object>> resultList = new LinkedList<>();
 
@@ -254,9 +274,12 @@ public class Jdbc {
 	 * @return map 记录数量不为1时返回null.
 	 */
 	public Map<String, Object> executeQueryM(Parameter parameter) {
-		logger.debug("【JDBC】 预编译SQL: \r\t" + parameter.getReadySql());
+		logger.debug("【JDBC】 预编译SQL: \r\t" + parameter.getFormatSql());
 		logger.debug("【JDBC】 预编译SQL对应的参数: " + parameter.getParams());
-	 
+		if(SqlVerification.isSelectSql(parameter.getReadySql())==false){
+			logger.debug("【JDBC】SQL语句不是查询语句：" + parameter.getFormatSql());
+			return null;
+		} 
 		List<Map<String, Object>> list = executeQueryL(parameter);
 		if (list.size() == 1) {
 			return list.get(0);
@@ -272,9 +295,12 @@ public class Jdbc {
 	 * @return 返回结果集对象.
 	 */
 	public ResultMap executeQuery(Parameter parameter) {
-		logger.debug("【JDBC】 预编译SQL: \r\t" + parameter.getReadySql());
+		logger.debug("【JDBC】 预编译SQL: \r\t" + parameter.getFormatSql());
 		logger.debug("【JDBC】 预编译SQL对应的参数: " + parameter.getParams());
-	 
+		if(SqlVerification.isSelectSql(parameter.getReadySql())==false){
+			logger.debug("【JDBC】SQL语句不是查询语句：" + parameter.getFormatSql());
+			return null;
+		} 
 		List<Map<String, Object>> list = executeQueryL(parameter);
 		if (list.size() == 1) {
 			ResultMap rm =new ResultMap(list.get(0));
@@ -294,9 +320,13 @@ public class Jdbc {
 	 * @return 实体对象
 	 */
 	public Object executeQuery(Parameter parameter, Class<?> entityClass) {
-		logger.debug("【JDBC】 预编译SQL: \r\t" + parameter.getReadySql());
+		
+		logger.debug("【JDBC】 预编译SQL: \r\t" + parameter.getFormatSql());
 		logger.debug("【JDBC】 预编译SQL对应的参数: " + parameter.getParams());
-		  
+		if(SqlVerification.isSelectSql(parameter.getReadySql())==false){
+			logger.debug("【JDBC】SQL语句不是查询语句：" + parameter.getFormatSql());
+			return null;
+		} 
 		List<Map<String, Object>> list = executeQueryL(parameter);
 		if (list.size() == 1) {
 			return ToEntity.toEntityObject(list.get(0), entityClass);
@@ -316,8 +346,12 @@ public class Jdbc {
 	 * @return 实体对象集合
 	 */
 	public List<?> executeQuerys(Parameter parameter, Class<?> entityClass) {
-		logger.debug("【JDBC】 预编译SQL: \r\t" + parameter.getReadySql());
+		logger.debug("【JDBC】 预编译SQL: \r\t" + parameter.getFormatSql());
 		logger.debug("【JDBC】 预编译SQL对应的参数: " + parameter.getParams());
+		if(SqlVerification.isSelectSql(parameter.getReadySql())==false){
+			logger.debug("【JDBC】SQL语句不是查询语句：" + parameter.getFormatSql());
+			return new LinkedList<>();
+		} 
 		List<Map<String, Object>> list = executeQueryL(parameter);
 		return ToEntity.findEntityObject(list, entityClass);
 		
@@ -368,7 +402,7 @@ public class Jdbc {
 
 		} catch (SQLException e) {
 			logger.debug(" 【JDBC】 执行存储过程,出现异常："+e.getMessage());
-			//e.printStackTrace();
+			 
 			return null;
 		} finally {
 			DBs.close(callableStatement, connection);

@@ -50,9 +50,9 @@ public class JdbcDao_Test {
 	@Test
 	public void gets2(){
 		 
-		Cond name = new Cond("name", LikeSign.LIKE, "AA");
+		Cond name = new Cond("name", LikeSign.LIKE, "AAA");
 		Cond id = new Cond("id", new Integer[]{1079,1080,1081});
-		Cond age = new Cond("age",EqualSign.GT,3);
+		Cond age = new Cond("age",1,100);
 		Cond pass = new  Cond("pass",LikeSign.LIKE,"h");
 		
 		And nameANDid = new And(name,id);
@@ -65,11 +65,11 @@ public class JdbcDao_Test {
 		
 		Cond o3 = new And(new And(name,id),new Or(age,pass)); 
 		
-		Cond a = new And(name,id,age,pass);
+		Cond a = new And(name ,age );
 		
 		Cond o4 = new Or(name,id,age,pass).and(new Cond("note", LikeSign.LIKE, "haha"));
 		
-		List<User> list  =   (List<User>) jdbcDao.gets(User.class, o4 );
+		List<User> list  =   (List<User>) jdbcDao.gets(User.class, a );
 		logger.info(list);
 	}
 	
@@ -118,7 +118,7 @@ public class JdbcDao_Test {
 	@Test
 	public void save(){
 		User u1 = new  User();
-		u1.setName("AAA");
+		u1.setName("AFJLSLDFJSFSF");
 		Long b = jdbcDao.save(u1);
 		
 		logger.info(b);

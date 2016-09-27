@@ -4,8 +4,11 @@ import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
- 
 
+import com.sooncode.jdbc.constant.CLASS_NAME;
+import com.sooncode.jdbc.constant.DATE_FORMAT;
+import com.sooncode.jdbc.constant.SQL_KEY;
+import com.sooncode.jdbc.constant.STRING;
 import com.sooncode.jdbc.reflect.RObject;
 import com.sooncode.jdbc.util.T2E;
 
@@ -32,33 +35,33 @@ public class ComSQL {
 		 
 		String tableName = T2E.toColumn(object.getClass().getSimpleName());
 		Map<String, Object> map =  new RObject(object).getFiledAndValue();
-		String columnString = "(";
-		String filedString = "(";
+		String columnString = SQL_KEY.L_BRACKET;
+		String filedString = SQL_KEY.L_BRACKET;
 		int n = 0;
 		for (Map.Entry<String, Object> entry : map.entrySet()) {
 
 			columnString = columnString + T2E.toColumn(entry.getKey());
 			if (entry.getValue() == null) {
-				filedString = filedString + "NULL";
+				filedString = filedString + SQL_KEY.NULL;
 			} else {
 
-				if (entry.getValue().getClass().getName().equals("java.util.Date")) {
-					filedString = filedString + "'" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(entry.getValue()) + "'";
+				if (entry.getValue().getClass().getName().equals(CLASS_NAME.DATE)) {
+					filedString = filedString + STRING.S_QUOTES+ new SimpleDateFormat(DATE_FORMAT.ALL_DATE).format(entry.getValue()) + STRING.S_QUOTES;
 				} else {
-					filedString = filedString + "'" + entry.getValue() + "'";
+					filedString = filedString + STRING.S_QUOTES + entry.getValue() + STRING.S_QUOTES;
 				}
 			}
 			if (n != map.size() - 1) {
-				columnString += ",";
-				filedString += ",";
+				columnString += SQL_KEY.COMMA;
+				filedString += SQL_KEY.COMMA;
 			} else {
-				columnString += ")";
-				filedString += ")";
+				columnString += SQL_KEY.R_BRACKET ;
+				filedString += SQL_KEY.R_BRACKET;
 			}
 			n++;
 
 		}
-		String sqlString = "INSERT INTO " + tableName + columnString + " VALUES " + filedString;
+		String sqlString = SQL_KEY.INSERT + tableName + columnString + SQL_KEY.VALUES + filedString;
 		Parameter p = new Parameter();
 		p.setReadySql(sqlString);
 		return p;
@@ -154,31 +157,27 @@ public class ComSQL {
 		String tableName = T2E.toColumn(object.getClass().getSimpleName());
 		Map<String, Object> map = new RObject(object).getFiledAndValue();
 		int m = 0;
-		String s = "1=1";
-		String c = "";
-		
+		String s = SQL_KEY.ONE_EQ_ONE;
+		String c = new String();
 		Map<Integer,Object> paramet = new HashMap<>();
 		Integer index = 1;
 		for (Entry<String, Object> entry : map.entrySet()) {
 			if (entry.getValue() != null) {
-				s = s + " AND ";
-				s = s + tableName+"."+ T2E.toColumn(entry.getKey()) + " = ?";
+				s = s +SQL_KEY.AND;
+				s = s + tableName+STRING.POINT+ T2E.toColumn(entry.getKey()) +SQL_KEY.EQ +STRING.QUESTION;
 				paramet.put(index,entry.getValue());
 				index++;
 			}
 			if (m != 0) {
-				c = c + ",";
+				c = c + SQL_KEY.COMMA;
 			}
-			c = c + tableName+"."+T2E.toColumn(entry.getKey()) + " AS " + tableName+"_"+T2E.toColumn(entry.getKey());
+			c = c + tableName+STRING.POINT+T2E.toColumn(entry.getKey()) + SQL_KEY.AS +   tableName+STRING.UNDERLINE+T2E.toColumn(entry.getKey());
 			m++;
 		}
-		String sql = "SELECT " + c + " FROM " + tableName + " WHERE " + s;
-		//logger.debug("【可执行SQL】:" + sql);
-		
+		String sql = SQL_KEY.SELECT  + c  + SQL_KEY.FROM + tableName + SQL_KEY.WHERE + s;
 		Parameter p = new Parameter();
 		p.setReadySql(sql);
 		p.setParams(paramet);
-		
 		return p;
 	}
 	
