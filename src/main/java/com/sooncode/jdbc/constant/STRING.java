@@ -57,5 +57,35 @@ public static final String COMMA = ",";
  * 百分号 "%"
  */
 public static final String  PERCENT = "%";
+/**
+ * "#"
+ */
+public static final String OCTOTHORPE = "#";
+
+/**
+ * "$"
+ */
+public static final String DOLLAR = "$";
+/**
+ * "{"
+ */
+public static final String L_CURLY_BRACKET = "{";
+
+/**
+ * "}"
+ */
+public static final String R_CURLY_BRACKET = "}";
+
+/**
+ * "null"
+ */
+public static final String S_NULL = "null";
+
+/**
+ * "@"
+ */
+public static final String AT = "@";
+
+
 
 }

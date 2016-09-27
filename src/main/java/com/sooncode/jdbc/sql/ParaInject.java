@@ -1,6 +1,7 @@
 package com.sooncode.jdbc.sql;
 
 import java.lang.reflect.Field;
+import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -9,6 +10,8 @@ import java.util.TreeMap;
 
 
 import org.apache.log4j.Logger;
+
+import com.sooncode.jdbc.constant.STRING;
  
 /**
  * SQL中的参数注入
@@ -38,15 +41,15 @@ public class ParaInject {
 		Parameter p = new Parameter();
 		Map<Integer,Object> parames = new HashMap<>();
 		Integer index =1;
-		if (args.length == 1 && args[0].getClass().getSuperclass().getName().equals("java.util.AbstractMap")) {
+		if (args.length == 1 && args[0].getClass().getSuperclass().getName().equals(AbstractMap.class.getName())) {//"java.util.AbstractMap"
 			map = (Map<String, Object>) args[0];
 			TemModule tm = getMap(templateSql,map);
 			templateSql = tm.getTemplateSql();
 			map = tm.getMap();
 			for (Map.Entry<String, Object> entry : map.entrySet()) {
-				String key = "#{" + entry.getKey() + "}";
+				String key = STRING.OCTOTHORPE + STRING.L_CURLY_BRACKET   + entry.getKey() +  STRING.R_CURLY_BRACKET ;
 				Object value = entry.getValue();
-				String newTemp = templateSql.replace(key, "?");
+				String newTemp = templateSql.replace(key, STRING.QUESTION);
 				if(!newTemp.equals(templateSql)){
 					templateSql = newTemp;
 					parames.put(index, value);
@@ -65,7 +68,7 @@ public class ParaInject {
 						if (f.get(obj) != null) {
 							map.put(f.getName(), f.get(obj).toString());
 						} else {
-							map.put(f.getName(), "null");
+							map.put(f.getName(), STRING.S_NULL);
 						}
 					} catch (IllegalArgumentException e) {
 						e.printStackTrace();
@@ -78,9 +81,9 @@ public class ParaInject {
 			templateSql = tm.getTemplateSql();
 			map = tm.getMap();
 			for (Map.Entry<String, Object> entry : map.entrySet()) {
-				String key ="#{"+ entry.getKey()+"}";
+				String key =STRING.OCTOTHORPE + STRING.L_CURLY_BRACKET+ entry.getKey()+STRING.R_CURLY_BRACKET;
 				Object value = entry.getValue();
-				String newTemp = templateSql.replace(key, "?");
+				String newTemp = templateSql.replace(key, STRING.QUESTION);
 				if(!newTemp.equals(templateSql)){
 					templateSql = newTemp;
 					parames.put(index, value);
@@ -100,8 +103,8 @@ public class ParaInject {
 		Map<Integer,String> tempMap = new TreeMap<>();
 		for(Entry<String, Object>en : map.entrySet()){
 			
-			templateSql = templateSql .replace("${"+en.getKey()+"}", en.getValue().toString());
-			String key = "#{"+en.getKey()+"}";
+			templateSql = templateSql .replace( STRING.DOLLAR + STRING.L_CURLY_BRACKET+en.getKey()+STRING.R_CURLY_BRACKET, en.getValue().toString());
+			String key = STRING.OCTOTHORPE + STRING.L_CURLY_BRACKET+en.getKey()+STRING.R_CURLY_BRACKET;
 			int index = sb.indexOf(key);
 			if(index!=-1){
 				tempMap.put(index,en.getKey());

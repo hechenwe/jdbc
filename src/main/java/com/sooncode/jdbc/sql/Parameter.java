@@ -90,8 +90,8 @@ public class Parameter {
 
 			for (int i = 1; i <= this.params.size(); i++) {
 				Object value = this.params.get(i);
-				int n = sql.indexOf("?");
-				sql.replace(n, n + 1, "'" + value.toString() + "'");
+				int n = sql.indexOf(STRING.QUESTION);
+				sql.replace(n, n + 1, STRING.S_QUOTES  + value.toString() +  STRING.S_QUOTES );
 			}
 		} else {
 			return readySql;
@@ -110,9 +110,9 @@ public class Parameter {
 		}else{
 			StringBuilder sql = new StringBuilder(this.readySql);
 			int size = 0;
-			while(sql.indexOf("?")!=-1){
-				int n = sql.indexOf("?");
-				sql.replace(n, n + 1, "@"); 
+			while(sql.indexOf(STRING.QUESTION)!=-1){
+				int n = sql.indexOf(STRING.QUESTION);
+				sql.replace(n, n + 1, STRING.AT); 
 				size ++;
 			}
 			
