@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import com.sooncode.jdbc.constant.STRING;
 import com.sooncode.jdbc.reflect.RObject;
 import com.sooncode.jdbc.util.T2E;
 
@@ -32,7 +33,7 @@ public class ToEntity {
 			for (Field field : fields) {
 				String fieldName = field.getName();
 				String columnName = T2E.toColumn(field.getName());
-				String key = tableName + "_" + columnName;
+				String key = tableName + STRING.UNDERLINE + columnName;
 
 				Object value = map.get(key);
 				if (value == null) {
@@ -70,7 +71,7 @@ public class ToEntity {
 		for (Field field : fields) {
 			String fieldName = field.getName();
 			String columnName = T2E.toColumn(field.getName());
-			String key = tableName + "_" + columnName;
+			String key = tableName + STRING.UNDERLINE + columnName;
 			Object value = map.get(key);
 			if (value == null) {
 				value = map.get(columnName);
