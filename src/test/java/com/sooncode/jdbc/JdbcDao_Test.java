@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import com.sooncode.jdbc.dao.JdbcDao;
 import com.sooncode.jdbc.dao.JdbcDaoFactory;
+import com.sooncode.jdbc.example.entity.User;
 import com.sooncode.jdbc.sql.condition.And;
 import com.sooncode.jdbc.sql.condition.Cond;
 import com.sooncode.jdbc.sql.condition.Conditions;
@@ -20,7 +21,7 @@ import com.sooncode.jdbc.sql.condition.sign.DateFormatSign;
 import com.sooncode.jdbc.sql.condition.sign.LikeSign;
 import com.sooncode.jdbc.sql.condition.sign.NullSign;
 import com.sooncode.jdbc.util.Pager;
-import com.sooncode.usejdbc.entity.User;
+ 
  
 public class JdbcDao_Test {
     private static Logger logger = Logger.getLogger("JdbcDaoTest.class");

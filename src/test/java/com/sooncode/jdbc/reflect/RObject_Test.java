@@ -8,7 +8,7 @@ import org.apache.log4j.Logger;
 import org.junit.Test;
 
 import com.sooncode.jdbc.reflect.modle.Student;
-import com.sooncode.usejdbc.entity.User;
+ 
 
 /**
  * 反射创建的对象

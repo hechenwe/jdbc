@@ -1,4 +1,4 @@
-package com.sooncode.usejdbc.entity;
+package com.sooncode.jdbc.example.entity;
 
 public class Persion   {
 

@@ -6,7 +6,8 @@ import java.util.List;
 import org.junit.Test;
 
 import com.sooncode.jdbc.cache.Cache2;
-import com.sooncode.usejdbc.entity.Persion;
+import com.sooncode.jdbc.example.entity.Persion;
+ 
  
 
 public class CacheTest {
