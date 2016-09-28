@@ -1,10 +1,7 @@
 package com.sooncode.jdbc.db;
 
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.sql.Connection;
@@ -12,6 +9,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -34,7 +32,7 @@ public class DBs {
 	 */
 	private static final String DB_PROPERTIES = "_db.properties";
 	/** 数据源缓存 */
-	private static Map<String, DB> dBcache = new HashMap<>();
+	private static Map<String, DB> dBcache = new Hashtable<>();
 
 	/** 源码所在路径 */
 	private static String classesPath = null;
@@ -83,6 +81,7 @@ public class DBs {
 			db.setEncodeing(pu.getString("ENCODEING"));
 			db.setUserName(pu.getString("USERNAME"));
 			db.setPassword(pu.getString("PASSWORD"));
+			db.setTransactionIsolation(pu.getString("TRANSACTION_ISOLATION"));
 			dBcache.put(db.getKey(), db);
 
 			Class<?> DataSources;
@@ -123,8 +122,8 @@ public class DBs {
 	/**
 	 * 获取数据库连接
 	 * 
-	 * @param dbKey
-	 *            代表连接数据库参数的关键字
+	 * @param dbKey 代表连接数据库参数的关键字
+	 *            
 	 * @return 数据库连接
 	 */
 	public static synchronized Connection getConnection(String dbKey) {
@@ -133,7 +132,29 @@ public class DBs {
 		if (c3p0properties != null && dataSources != null && dataSources.size() != 0) {
 			try {
 				connection = dataSources.get(dbKey).getConnection();
-				connection.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+				/*
+				 * //设置事务隔离级别：
+				 * Connection.TRANSACTION_NONE （0） :指示事务不受支持的常量。(注意，不能使用 ，因为它指定了不受支持的事务。) （不支持事务）
+				 * Connection.TRANSACTION_READ_UNCOMMITTED （1） :指示可以发生脏读 (dirty read)、不可重复读和虚读 (phantom read) 的常量。
+				 * Connection.TRANSACTION_READ_COMMITTED （2）:指示不可以发生脏读的常量；不可重复读和虚读可以发生。
+                 * Connection.TRANSACTION_REPEATABLE_READ （4） :指示不可以发生脏读和不可重复读的常量；虚读可以发生。  (JDBC 默认值)
+                 * Connection.TRANSACTION_SERIALIZABLE （8）: 指示不可以发生脏读、不可重复读和虚读的常量。
+				 * */
+				//connection.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED); 
+				String ransactionIsolation = dBcache.get(dbKey).getTransactionIsolation();
+				if(ransactionIsolation != null){
+					if(ransactionIsolation.equals("TRANSACTION_NONE")){//0
+						connection.setTransactionIsolation(Connection.TRANSACTION_NONE);
+					}else if(ransactionIsolation.equals("TRANSACTION_READ_UNCOMMITTED")){//1
+						connection.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
+					}else if(ransactionIsolation.equals("TRANSACTION_SERIALIZABLE")){//8
+						connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
+					}if(ransactionIsolation.equals("TRANSACTION_READ_COMMITTED")){//2
+						connection.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+					}
+				}
+				int n = connection.getTransactionIsolation();
+				logger.error("【JDBC】数据库["+dBcache.get(dbKey).getDataName()+"]的事务隔离级别为："+n);
 			} catch (SQLException e) {
 				logger.error("【JDBC】: 获取数据库连接失败 ");
 				e.printStackTrace();
@@ -172,8 +193,8 @@ public class DBs {
 	/**
 	 * 关闭连接资源
 	 * 
-	 * @param objs
-	 *            含有colse()方法的对象集合
+	 * @param objs 含有colse()方法的对象集合
+	 *            
 	 * 
 	 */
 	public static void close(Object... objs) {
@@ -191,7 +212,11 @@ public class DBs {
 		}
 	}
 
-	/** 扫描数据库配置文件 */
+	 
+	/**
+	 * 扫描数据库配置文件
+	 * @return List  配置文件名称 集合.
+	 */
 	private static List<String> getDbConfig() {
 		File file = new File(classesPath);
 		String test[];
@@ -234,70 +259,4 @@ public class DBs {
 	}
 }
 
-/**
- * 配置文件 读取工具类
- * 
- * @author pc
- *
- */
-class PropertiesUtil {
-	/**
-	 * 配置文件所在路径
-	 */
-	private String filePath;
 
-	public PropertiesUtil(String filePath) {
-		this.filePath = filePath;
-	}
-
-	/**
-	 * 根据Key读取Value
-	 * 
-	 * @param filePath
-	 *            配置文件 (默认在src下)
-	 * 
-	 * @param key
-	 *            关键字
-	 * @return 值
-	 */
-	public String getString(String key) {
-		Properties p = new Properties();
-		try {
-			InputStreamReader in = new InputStreamReader(new FileInputStream(this.filePath), "utf-8");
-			p.load(in);
-			String value = p.getProperty(key);
-			return value.trim();
-
-		} catch (IOException e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
-
-	/**
-	 * 根据Key读取Value
-	 * 
-	 * @param filePath
-	 *            配置文件 (默认在src下)
-	 * 
-	 * @param key
-	 *            关键字
-	 * 
-	 * @return int
-	 */
-	public Integer getInt(String key) {
-		Properties properties = new Properties();
-		try {
-			InputStream in = new BufferedInputStream(new FileInputStream(this.filePath));
-			properties.load(in);
-			String value = properties.getProperty(key);
-			Integer val = Integer.parseInt(value.trim());
-			return val;
-
-		} catch (Exception e) {
-
-			return null;
-		}
-	}
-
-}

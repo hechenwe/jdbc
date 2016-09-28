@@ -1,5 +1,6 @@
 package com.sooncode.jdbc;
 
+ 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -198,6 +199,7 @@ public class JdbcDao_Test {
 		
 		logger.info(p);
 		
+		 
 		
 	}
 }

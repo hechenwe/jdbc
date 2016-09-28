@@ -1,6 +1,5 @@
 package com.sooncode.jdbc.db;
-
-public class DB {
+class DB {
 	
 	/**数据源唯一标识码*/
 	private String key;
@@ -25,8 +24,10 @@ public class DB {
 	
 	/**数据库密码*/
 	private String password;
-
-	
+    /**
+     * 事务隔离级别 （可选参数）
+     */
+	private String transactionIsolation;
 	//-----------------------------------------------------------------------------
 	public String getKey() {
 		return key;
@@ -90,6 +91,14 @@ public class DB {
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+
+	public String getTransactionIsolation() {
+		return transactionIsolation;
+	}
+
+	public void setTransactionIsolation(String transactionIsolation) {
+		this.transactionIsolation = transactionIsolation;
 	}
 
 

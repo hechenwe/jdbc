@@ -4,6 +4,7 @@ package com.sooncode.jdbc;
 import java.math.BigDecimal;
 import java.sql.CallableStatement;
 import java.sql.Connection;
+ 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -12,7 +13,7 @@ import java.sql.Statement;
 import java.sql.Types;
 import java.text.SimpleDateFormat;
 import java.util.LinkedList;
-
+import java.util.Date;
 import java.util.HashMap;
 
 import java.util.List;
@@ -475,44 +476,46 @@ public class Jdbc {
 
 		try {
 
-			if (className.equals("java.lang.String")) {
+			if (className.equals(String.class.getName())) {//  "java.lang.String"
 				preparedStatement.setString(index, obj.toString());
 			}
 
-			if (className.equals("java.lang.Integer")) {
+			if (className.equals(Integer.class.getName())) {//"java.lang.Integer"
 				preparedStatement.setInt(index, (Integer) obj);
 			}
 
-			if (className.equals("java.lang.Long")) {
+			if (className.equals(Long.class.getName())) {//"java.lang.Long"
 				preparedStatement.setLong(index, (Long) obj);
 			}
 
-			if (className.equals("java.lang.Short")) {
+			if (className.equals(Short.class.getName())) {//"java.lang.Short"
 				preparedStatement.setShort(index, (Short) obj);
 			}
 
-			if (className.equals("java.lang.Boolean")) {
+			if (className.equals(Boolean.class.getName())) {//"java.lang.Boolean"
 				preparedStatement.setBoolean(index, (Boolean) obj);
 			}
 
-			if (className.equals("java.lang.Byte")) {
+			if (className.equals(Byte.class.getName())) {//"java.lang.Byte"
 				preparedStatement.setByte(index, (Byte) obj);
 			}
 
-			if (className.equals("java.util.Date")) {
+			if (className.equals(Date.class.getName())) {//"java.util.Date"
 				String d = new SimpleDateFormat(DATE_FORMAT.ALL_DATE).format(obj);
 				preparedStatement.setString(index, d);
 			}
 
-			if (className.equals("java.lang.Float")) {
+			if (className.equals(Float.class.getName())) {//"java.lang.Float"
 				preparedStatement.setFloat(index, (Float) obj);
 			}
-			if (className.equals("java.math.BigDecimal")) {
+			if (className.equals(BigDecimal.class.getName())) {//"java.math.BigDecimal"
 				preparedStatement.setBigDecimal(index, (BigDecimal) obj);
 			}
-			if (className.equals("java.lang.Double")) {
+			if (className.equals(Double.class.getName())) {//"java.lang.Double"
 				preparedStatement.setDouble(index, (Double) obj);
 			}
+			
+			 
 
 		} catch (SQLException e) {
 			logger.error("【JDBC】:  预编译SQL设置参数失败 ");
