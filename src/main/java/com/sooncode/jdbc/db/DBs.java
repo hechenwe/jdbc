@@ -65,7 +65,7 @@ public class DBs {
 			c3p0properties = c3p0;
 		} catch (Exception e) {
 			c3p0properties = null;
-			logger.debug("【JDBC】:  加载c3p0  配置文件失败 ");
+			logger.debug("【JDBC】: 加载c3p0  配置文件失败 ");
 		}
 
 		for (String str : dbConfig) {
@@ -97,18 +97,21 @@ public class DBs {
 				try {
 					// 加载驱动类
 					Class.forName(db.getDriver());
-					String jdbcUrl = "jdbc:mysql://" + db.getIp() + ":" + db.getPort() + "/" + db.getDataName() + "?useUnicode=true&characterEncoding=" + db.getEncodeing();
+					String jdbcUrl = "jdbc:mysql://" + db.getIp() + ":" + db.getPort() + "/" + db.getDataName()
+							+ "?useUnicode=true&characterEncoding=" + db.getEncodeing();
 					Properties p = new Properties();
 
 					p.setProperty("user", db.getUserName());
 					p.setProperty("password", db.getPassword());
 
-					Method unpooledDataSource = DataSources.getMethod("unpooledDataSource", String.class, Properties.class);
+					Method unpooledDataSource = DataSources.getMethod("unpooledDataSource", String.class,
+							Properties.class);
 
 					DataSource ds = (DataSource) unpooledDataSource.invoke(null, jdbcUrl, p);
-					Method pooledDataSource = DataSources.getMethod("pooledDataSource", DataSource.class, Properties.class);
+					Method pooledDataSource = DataSources.getMethod("pooledDataSource", DataSource.class,
+							Properties.class);
 					ds = (DataSource) pooledDataSource.invoke(null, ds, p);
-					 
+
 					dss.put(db.getKey(), ds);
 					logger.info("【JDBC】: 已添加c3p0连接池 ;数据库" + db.getDataName());
 				} catch (Exception e) {
@@ -122,8 +125,9 @@ public class DBs {
 	/**
 	 * 获取数据库连接
 	 * 
-	 * @param dbKey 代表连接数据库参数的关键字
-	 *            
+	 * @param dbKey
+	 *            代表连接数据库参数的关键字
+	 * 
 	 * @return 数据库连接
 	 */
 	public static synchronized Connection getConnection(String dbKey) {
@@ -132,29 +136,7 @@ public class DBs {
 		if (c3p0properties != null && dataSources != null && dataSources.size() != 0) {
 			try {
 				connection = dataSources.get(dbKey).getConnection();
-				/*
-				 * //设置事务隔离级别：
-				 * Connection.TRANSACTION_NONE （0） :指示事务不受支持的常量。(注意，不能使用 ，因为它指定了不受支持的事务。) （不支持事务）
-				 * Connection.TRANSACTION_READ_UNCOMMITTED （1） :指示可以发生脏读 (dirty read)、不可重复读和虚读 (phantom read) 的常量。
-				 * Connection.TRANSACTION_READ_COMMITTED （2）:指示不可以发生脏读的常量；不可重复读和虚读可以发生。
-                 * Connection.TRANSACTION_REPEATABLE_READ （4） :指示不可以发生脏读和不可重复读的常量；虚读可以发生。  (JDBC 默认值)
-                 * Connection.TRANSACTION_SERIALIZABLE （8）: 指示不可以发生脏读、不可重复读和虚读的常量。
-				 * */
-				//connection.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED); 
-				String ransactionIsolation = dBcache.get(dbKey).getTransactionIsolation();
-				if(ransactionIsolation != null){
-					if(ransactionIsolation.equals("TRANSACTION_NONE")){//0
-						connection.setTransactionIsolation(Connection.TRANSACTION_NONE);
-					}else if(ransactionIsolation.equals("TRANSACTION_READ_UNCOMMITTED")){//1
-						connection.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
-					}else if(ransactionIsolation.equals("TRANSACTION_SERIALIZABLE")){//8
-						connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
-					}if(ransactionIsolation.equals("TRANSACTION_READ_COMMITTED")){//2
-						connection.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
-					}
-				}
-				int n = connection.getTransactionIsolation();
-				logger.error("【JDBC】数据库["+dBcache.get(dbKey).getDataName()+"]的事务隔离级别为："+n);
+				setTransactionIsolation(dbKey, connection);
 			} catch (SQLException e) {
 				logger.error("【JDBC】: 获取数据库连接失败 ");
 				e.printStackTrace();
@@ -170,7 +152,8 @@ public class DBs {
 			String USERNAME = db.getUserName();
 			String PASSWORD = db.getPassword();
 
-			String mysqlUrl = "jdbc:mysql://" + IP + ":" + PORT + "/" + DATA_NAME + "?useUnicode=true&characterEncoding=" + ENCODEING;
+			String mysqlUrl = "jdbc:mysql://" + IP + ":" + PORT + "/" + DATA_NAME
+					+ "?useUnicode=true&characterEncoding=" + ENCODEING;
 
 			try {
 				Class.forName(DRIVER);
@@ -180,6 +163,7 @@ public class DBs {
 			}
 			try {
 				connection = DriverManager.getConnection(mysqlUrl, USERNAME, PASSWORD);
+				setTransactionIsolation(dbKey, connection);
 			} catch (SQLException e) {
 				logger.info("【JDBC】: 数据库连接失败 ");
 				return null;
@@ -193,8 +177,9 @@ public class DBs {
 	/**
 	 * 关闭连接资源
 	 * 
-	 * @param objs 含有colse()方法的对象集合
-	 *            
+	 * @param objs
+	 *            含有colse()方法的对象集合
+	 * 
 	 * 
 	 */
 	public static void close(Object... objs) {
@@ -212,10 +197,10 @@ public class DBs {
 		}
 	}
 
-	 
 	/**
 	 * 扫描数据库配置文件
-	 * @return List  配置文件名称 集合.
+	 * 
+	 * @return List 配置文件名称 集合.
 	 */
 	private static List<String> getDbConfig() {
 		File file = new File(classesPath);
@@ -244,8 +229,8 @@ public class DBs {
 		String path = this.getClass().getResource("/").getPath();
 		File file = new File(path);
 		String classesPath = file.toString() + File.separatorChar;
-		classesPath=classesPath.replace("%20", STRING.SPACING);
-		logger.debug("【JDBC】: classesPath=" + classesPath ); 
+		classesPath = classesPath.replace("%20", STRING.SPACING);
+		logger.debug("【JDBC】: classesPath=" + classesPath);
 		return classesPath;
 
 		/*
@@ -257,6 +242,41 @@ public class DBs {
 		 */
 
 	}
+
+	/**
+	 * 设置事务隔离级别
+	 * 
+	 * @param dbKey
+	 * @param connection
+	 */
+	private static void setTransactionIsolation(String dbKey, Connection connection) {
+		/*
+		 * 设置事务隔离级别： Connection.TRANSACTION_NONE （0） :指示事务不受支持的常量。(注意，不能使用
+		 * ，因为它指定了不受支持的事务。) （不支持事务） Connection.TRANSACTION_READ_UNCOMMITTED （1）
+		 * :指示可以发生脏读 (dirty read)、不可重复读和虚读 (phantom read) 的常量。
+		 * Connection.TRANSACTION_READ_COMMITTED （2）:指示不可以发生脏读的常量；不可重复读和虚读可以发生。
+		 * Connection.TRANSACTION_REPEATABLE_READ （4）
+		 * :指示不可以发生脏读和不可重复读的常量；虚读可以发生。 (JDBC 默认值)
+		 * Connection.TRANSACTION_SERIALIZABLE （8）: 指示不可以发生脏读、不可重复读和虚读的常量。
+		 */
+		try {
+			String ransactionIsolation = dBcache.get(dbKey).getTransactionIsolation();
+			if (ransactionIsolation != null) {
+				if (ransactionIsolation.equals("TRANSACTION_NONE")) {// 0
+					connection.setTransactionIsolation(Connection.TRANSACTION_NONE);
+				} else if (ransactionIsolation.equals("TRANSACTION_READ_UNCOMMITTED")) {// 1
+					connection.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
+				} else if (ransactionIsolation.equals("TRANSACTION_SERIALIZABLE")) {// 8
+					connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
+				}
+				if (ransactionIsolation.equals("TRANSACTION_READ_COMMITTED")) {// 2
+					connection.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+				}
+			}
+			int n = connection.getTransactionIsolation();
+			logger.error("【JDBC】数据库[" + dBcache.get(dbKey).getDataName() + "]的事务隔离级别为：" + n);
+		} catch (Exception e) {
+			logger.error("【JDBC】数据库[" + dBcache.get(dbKey).getDataName() + "]的事务隔离级别设置失败!");
+		}
+	}
 }
-
-

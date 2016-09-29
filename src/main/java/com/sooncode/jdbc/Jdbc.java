@@ -1,10 +1,9 @@
 package com.sooncode.jdbc;
 
- 
 import java.math.BigDecimal;
 import java.sql.CallableStatement;
 import java.sql.Connection;
- 
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -29,7 +28,6 @@ import com.sooncode.jdbc.db.DBs;
 import com.sooncode.jdbc.result.ResultMap;
 import com.sooncode.jdbc.sql.Parameter;
 import com.sooncode.jdbc.sql.verification.SqlVerification;
- 
 
 /**
  * 执行SQL语句核心类
@@ -41,46 +39,31 @@ public class Jdbc {
 
 	public final static Logger logger = Logger.getLogger("Jdbc.class");
 
-	/** sql中的参数个数 */
-	private static int counter = 0;
-	
-	
-	
-	
 	/**
 	 * 数据库资源Key 默认是：default 关键字； 代表一组数据库连接参数
 	 */
 	private String dbKey = DATA.DEFAULT_KEY;
 
-	
-	
-	
 	/**
 	 * 
-	 * @param dbKey 数据源关键字
-	 *            
+	 * @param dbKey
+	 *            数据源关键字
+	 * 
 	 */
 	Jdbc(String dbKey) {
-		if(dbKey!=null && !dbKey.trim().equals(STRING.NULL_STR)){
+		if (dbKey != null && !dbKey.trim().equals(STRING.NULL_STR)) {
 			this.dbKey = dbKey;
 		}
 
 	}
 
-	
-	
-    Jdbc() {
+	Jdbc() {
 		// 默认使用default 数据库连接参数
 	}
 
-	
-	
- 
-	
-	
 	/**
-	 * 执行更新语句：添加，删除，修改。
-	 * 可防止SQL注入，推荐使用。
+	 * 执行更新语句：添加，删除，修改。 可防止SQL注入，推荐使用。
+	 * 
 	 * @param connection
 	 *            数据库连接
 	 * 
@@ -90,22 +73,22 @@ public class Jdbc {
 	 * @return 一般情况是返回受影响的行数,当有主键为自增字段,在添加数据时返回 自增值。当执行出现异常时放回null.
 	 */
 	public Long executeUpdate(Parameter p) {
-		if(p==null){
+		if (p == null) {
 			return null;
 		}
-		
-		if(p.isNotException()==false){
+
+		if (p.isNotException() == false) {
 			logger.debug("【JDBC】:预编译SQL和参数出现异常！");
 			return null;
 		}
 		String sql = p.getReadySql();
 		logger.debug("【JDBC】 预编译SQL: " + p.getFormatSql());
 		logger.debug("【JDBC】 预编译SQL对应的参数: " + p.getParams());
-		if(SqlVerification.isUpdateSql(sql)==false){
+		if (SqlVerification.isUpdateSql(sql) == false) {
 			logger.debug("【JDBC】SQL语句不是更新语句：" + p.getFormatSql());
 			return null;
 		}
-		
+
 		Connection connection = DBs.getConnection(this.dbKey);
 		PreparedStatement preparedStatement = null;
 		ResultSet resultSet = null;
@@ -136,17 +119,18 @@ public class Jdbc {
 	/**
 	 * 批量执行更新语句(静态SQL语句)
 	 * 
-	 * @param sqls 可执行更新的SQL语句集合
-	 *            
+	 * @param sqls
+	 *            可执行更新的SQL语句集合
+	 * 
 	 * @return 成功返回true ,失败返回 false.
 	 */
 	public Boolean executeUpdates(List<String> sqls) {
 		for (String sql : sqls) {
-			if(SqlVerification.isUpdateSql(sql)==false){
+			if (SqlVerification.isUpdateSql(sql) == false) {
 				logger.debug("【JDBC】SQL语句不是更新语句：" + Parameter.getFormatSql(sql));
 				return false;
 			}
-			
+
 		}
 
 		Connection connection = DBs.getConnection(this.dbKey);
@@ -166,36 +150,38 @@ public class Jdbc {
 			try {
 				connection.rollback();
 			} catch (SQLException e1) {
-				logger.error("【JDBC】 事务回滚失败 !  "+e1.getMessage());
+				logger.error("【JDBC】 事务回滚失败 !  " + e1.getMessage());
 			}
 			logger.error("【JDBC】 批量执行失败 !");
 			return false;
 		}
 
 	}
-	
-	
+
 	/**
 	 * 执行更新语句
-	 * @param readySql 预编译SQL
-	 * @param parameters 预编译SQL需要的参数
+	 * 
+	 * @param readySql
+	 *            预编译SQL
+	 * @param parameters
+	 *            预编译SQL需要的参数
 	 * @return 执行成功返回true;执行失败返回false.
 	 */
-	public Boolean executeUpdate( String readySql,  List<Map<Integer,Object>> parameters ) {
+	public Boolean executeUpdate(String readySql, List<Map<Integer, Object>> parameters) {
 		logger.debug("【JDBC】 预编译SQL:" + Parameter.getFormatSql(readySql));
 		logger.debug("【JDBC】 预编译SQL对应的参数: " + parameters);
-		if(SqlVerification.isUpdateSql(readySql)==false){
+		if (SqlVerification.isUpdateSql(readySql) == false) {
 			logger.debug("【JDBC】SQL语句不是更新语句：" + Parameter.getFormatSql(readySql));
 			return false;
 		}
 		Connection connection = DBs.getConnection(this.dbKey);
 		try {
 			connection.setAutoCommit(false);
-			PreparedStatement ps = connection.prepareStatement(readySql); 
-			for (Map<Integer,Object>   p : parameters) {
-				for(int i =1 ;i<=p.size();i++){
+			PreparedStatement ps = connection.prepareStatement(readySql);
+			for (Map<Integer, Object> p : parameters) {
+				for (int i = 1; i <= p.size(); i++) {
 					Object value = p.get(i);
-				    preparedStatementSet(ps, i, value);
+					preparedStatementSet(ps, i, value);
 				}
 				ps.addBatch();
 			}
@@ -207,31 +193,27 @@ public class Jdbc {
 			try {
 				connection.rollback();
 			} catch (SQLException e1) {
-			 
+
 			}
 			logger.error("【JDBC】 批量执行失败 !");
 			return false;
 		}
-		
+
 	}
-	
-	
- 
-	 
 
 	/**
-	 * 执行查询语句(可能有多条记录)。
-	 * 可防止SQL注入，推荐使用。
+	 * 执行查询语句(可能有多条记录)。 可防止SQL注入，推荐使用。
+	 * 
 	 * @parameter 参数模型
 	 * @return List
 	 */
 	public List<Map<String, Object>> executeQueryL(Parameter parameter) {
 		logger.debug("【JDBC】 预编译SQL:" + parameter.getFormatSql());
 		logger.debug("【JDBC】 预编译SQL对应的参数: " + parameter.getParams());
-		if(SqlVerification.isSelectSql(parameter.getReadySql())==false){
+		if (SqlVerification.isSelectSql(parameter.getReadySql()) == false) {
 			logger.debug("【JDBC】SQL语句不是查询语句：" + parameter.getFormatSql());
 			return new LinkedList<>();
-		} 
+		}
 		Connection connection = DBs.getConnection(this.dbKey);
 		List<Map<String, Object>> resultList = new LinkedList<>();
 
@@ -263,28 +245,26 @@ public class Jdbc {
 			return resultList;
 		} catch (SQLException e) {
 			logger.debug("【JDBC】 SQL语句执行异常 :" + parameter.getReadySql());
-			//e.printStackTrace();
+			// e.printStackTrace();
 			return new LinkedList<>();
 		} finally {
 			DBs.close(resultSet, preparedStatement, connection);
 		}
 	}
-    
-	 
-	
+
 	/**
-	 * 执行查询语句 (只有一条返回记录)。
-	 * 可防止SQL注入，推荐使用。
+	 * 执行查询语句 (只有一条返回记录)。 可防止SQL注入，推荐使用。
+	 * 
 	 * @param sql可执行SQL
 	 * @return map 记录数量不为1时返回null.
 	 */
 	public Map<String, Object> executeQueryM(Parameter parameter) {
 		logger.debug("【JDBC】 预编译SQL:" + parameter.getFormatSql());
 		logger.debug("【JDBC】 预编译SQL对应的参数: " + parameter.getParams());
-		if(SqlVerification.isSelectSql(parameter.getReadySql())==false){
+		if (SqlVerification.isSelectSql(parameter.getReadySql()) == false) {
 			logger.debug("【JDBC】SQL语句不是查询语句：" + parameter.getFormatSql());
 			return null;
-		} 
+		}
 		List<Map<String, Object>> list = executeQueryL(parameter);
 		if (list.size() == 1) {
 			return list.get(0);
@@ -294,30 +274,30 @@ public class Jdbc {
 	}
 
 	/**
-	 * 执行查询语句 (只有一条返回记录)。
-	 * 可防止SQL注入，推荐使用。
+	 * 执行查询语句 (只有一条返回记录)。 可防止SQL注入，推荐使用。
+	 * 
 	 * @param sql可执行SQL
 	 * @return 返回结果集对象.
 	 */
 	public ResultMap executeQuery(Parameter parameter) {
 		logger.debug("【JDBC】 预编译SQL:" + parameter.getFormatSql());
 		logger.debug("【JDBC】 预编译SQL对应的参数: " + parameter.getParams());
-		if(SqlVerification.isSelectSql(parameter.getReadySql())==false){
+		if (SqlVerification.isSelectSql(parameter.getReadySql()) == false) {
 			logger.debug("【JDBC】SQL语句不是查询语句：" + parameter.getFormatSql());
 			return null;
-		} 
+		}
 		List<Map<String, Object>> list = executeQueryL(parameter);
 		if (list.size() == 1) {
-			ResultMap rm =new ResultMap(list.get(0));
+			ResultMap rm = new ResultMap(list.get(0));
 			return rm;
 		} else {
 			return null;
 		}
 	}
-	 
+
 	/**
-	 * 执行查询语句 (只有一条返回记录)
-	 * 可防止SQL注入，推荐使用。
+	 * 执行查询语句 (只有一条返回记录) 可防止SQL注入，推荐使用。
+	 * 
 	 * @param sql
 	 *            可执行文件
 	 * @param entityClass
@@ -325,13 +305,13 @@ public class Jdbc {
 	 * @return 实体对象
 	 */
 	public Object executeQuery(Parameter parameter, Class<?> entityClass) {
-		
+
 		logger.debug("【JDBC】 预编译SQL:" + parameter.getFormatSql());
 		logger.debug("【JDBC】 预编译SQL对应的参数: " + parameter.getParams());
-		if(SqlVerification.isSelectSql(parameter.getReadySql())==false){
+		if (SqlVerification.isSelectSql(parameter.getReadySql()) == false) {
 			logger.debug("【JDBC】SQL语句不是查询语句：" + parameter.getFormatSql());
 			return null;
-		} 
+		}
 		List<Map<String, Object>> list = executeQueryL(parameter);
 		if (list.size() == 1) {
 			return ToEntity.toEntityObject(list.get(0), entityClass);
@@ -340,10 +320,9 @@ public class Jdbc {
 		}
 	}
 
-	 
 	/**
-	 * 执行查询语句
-	 * 注意：防止SQL注入漏洞。
+	 * 执行查询语句 注意：防止SQL注入漏洞。
+	 * 
 	 * @param sql
 	 *            可执行文件
 	 * @param entityClass
@@ -353,14 +332,13 @@ public class Jdbc {
 	public List<?> executeQuerys(Parameter parameter, Class<?> entityClass) {
 		logger.debug("【JDBC】 预编译SQL:" + parameter.getFormatSql());
 		logger.debug("【JDBC】 预编译SQL对应的参数: " + parameter.getParams());
-		if(SqlVerification.isSelectSql(parameter.getReadySql())==false){
+		if (SqlVerification.isSelectSql(parameter.getReadySql()) == false) {
 			logger.debug("【JDBC】SQL语句不是查询语句：" + parameter.getFormatSql());
 			return new LinkedList<>();
-		} 
+		}
 		List<Map<String, Object>> list = executeQueryL(parameter);
 		return ToEntity.findEntityObject(list, entityClass);
-		
-		 
+
 	}
 
 	/**
@@ -377,7 +355,7 @@ public class Jdbc {
 	 * 
 	 * @return 存储过程的 返回参数值,当没有返回参数时 返回null
 	 */
-	public Object executeProcedure(String sql, Object... in) {
+	public Object executeProcedure(String sql, Object... ins) {
 		logger.debug("【JDBC】:存储过程 SQL  " + sql);
 		Connection connection = DBs.getConnection(this.dbKey);
 		// sql 中参数的个数
@@ -389,16 +367,16 @@ public class Jdbc {
 			// 创建过程执行器
 			callableStatement = connection.prepareCall(sql);
 			// 设置入参和出参
-			for (int i = 1; i <= in.length; i++) {
-				callableStatement.setObject(i, in[i - 1]);
+			for (int i = 1; i <= ins.length; i++) {
+				callableStatement.setObject(i, ins[i - 1]);
 			}
 
-			if (n - in.length == 1) {
+			if (n - ins.length == 1) {
 				callableStatement.registerOutParameter(n, Types.JAVA_OBJECT); // 注册出参
 				callableStatement.executeUpdate();
 				Object result = callableStatement.getObject(n);
 				return result;
-			} else if (n == in.length) { // 没有输出参数
+			} else if (n == ins.length) { // 没有输出参数
 				callableStatement.executeUpdate();
 				return null;
 			} else { // 参数不匹配
@@ -406,8 +384,8 @@ public class Jdbc {
 			}
 
 		} catch (SQLException e) {
-			logger.debug(" 【JDBC】 执行存储过程,出现异常："+e.getMessage());
-			 
+			logger.debug(" 【JDBC】 执行存储过程,出现异常：" + e.getMessage());
+
 			return null;
 		} finally {
 			DBs.close(callableStatement, connection);
@@ -459,63 +437,57 @@ public class Jdbc {
 			} catch (SQLException e) {
 				logger.info("【JDBC】:事务提交失败");
 			}
-			// if (DBs.c3p0properties == null) {
+			 
 			DBs.close(preparedStatement, connection);
-			// }
+			 
 		}
 	}
+
 	/**
-     * 设置参数
-     * @param preparedStatement
-     * @param index
-     * @param obj
-     */
+	 * 设置参数
+	 * 
+	 * @param preparedStatement
+	 * @param index
+	 * @param obj
+	 */
 	private void preparedStatementSet(PreparedStatement preparedStatement, Integer index, Object obj) {
 
 		String className = obj.getClass().getName();
 
 		try {
 
-			if (className.equals(String.class.getName())) {//  "java.lang.String"
+			/*if (className.equals(String.class.getName())) {// "java.lang.String"
 				preparedStatement.setString(index, obj.toString());
-			}
-
-			if (className.equals(Integer.class.getName())) {//"java.lang.Integer"
+			} else
+			if (className.equals(Integer.class.getName())) {// "java.lang.Integer"
 				preparedStatement.setInt(index, (Integer) obj);
-			}
-
-			if (className.equals(Long.class.getName())) {//"java.lang.Long"
+			} else
+			if (className.equals(Long.class.getName())) {// "java.lang.Long"
 				preparedStatement.setLong(index, (Long) obj);
-			}
-
-			if (className.equals(Short.class.getName())) {//"java.lang.Short"
+			} else
+			if (className.equals(Short.class.getName())) {// "java.lang.Short"
 				preparedStatement.setShort(index, (Short) obj);
-			}
-
-			if (className.equals(Boolean.class.getName())) {//"java.lang.Boolean"
+			} else
+			if (className.equals(Boolean.class.getName())) {// "java.lang.Boolean"
 				preparedStatement.setBoolean(index, (Boolean) obj);
-			}
-
-			if (className.equals(Byte.class.getName())) {//"java.lang.Byte"
+			} else
+			if (className.equals(Byte.class.getName())) {// "java.lang.Byte"
 				preparedStatement.setByte(index, (Byte) obj);
-			}
-
-			if (className.equals(Date.class.getName())) {//"java.util.Date"
+			} if (className.equals(Float.class.getName())) {// "java.lang.Float"
+				preparedStatement.setFloat(index, (Float) obj);
+			} else if (className.equals(BigDecimal.class.getName())) {// "java.math.BigDecimal"
+				preparedStatement.setBigDecimal(index, (BigDecimal) obj);
+			} else if (className.equals(Double.class.getName())) {// "java.lang.Double"
+				preparedStatement.setDouble(index, (Double) obj);
+			} else
+			
+			 */
+			if (className.equals(Date.class.getName())) {// "java.util.Date"
 				String d = new SimpleDateFormat(DATE_FORMAT.ALL_DATE).format(obj);
 				preparedStatement.setString(index, d);
+			} else  {
+				preparedStatement.setObject(index, obj);
 			}
-
-			if (className.equals(Float.class.getName())) {//"java.lang.Float"
-				preparedStatement.setFloat(index, (Float) obj);
-			}
-			if (className.equals(BigDecimal.class.getName())) {//"java.math.BigDecimal"
-				preparedStatement.setBigDecimal(index, (BigDecimal) obj);
-			}
-			if (className.equals(Double.class.getName())) {//"java.lang.Double"
-				preparedStatement.setDouble(index, (Double) obj);
-			}
-			
-			 
 
 		} catch (SQLException e) {
 			logger.error("【JDBC】:  预编译SQL设置参数失败 ");
@@ -523,11 +495,8 @@ public class Jdbc {
 
 	}
 
-	
-	
-	
 	/**
-	 * 计算sql中的参数个数
+	 * 计算sql中的参数个数 (执行存储过程是使用)
 	 * 
 	 * @param sql
 	 * @param parameter
@@ -536,14 +505,15 @@ public class Jdbc {
 	 */
 	private static int countParameter(String sql, String parameter) {
 
-		if (sql.indexOf(parameter) == -1) {
-			return 0;
-		} else if (sql.indexOf(parameter) != -1) {
-			counter++;
-			countParameter(sql.substring(sql.indexOf(parameter) + parameter.length()), parameter);
-			return counter;
+		StringBuffer sb = new StringBuffer(sql);
+		int n = 0;
+		int index = sb.indexOf(STRING.QUESTION);
+		while (index != -1) {
+			sb.replace(index, index + 1, "");
+			index = sb.indexOf(STRING.QUESTION);
+			n++;
 		}
-		return 0;
+		return n;
 	}
 
 }
