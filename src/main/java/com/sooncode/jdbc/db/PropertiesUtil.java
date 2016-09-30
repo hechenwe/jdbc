@@ -26,14 +26,18 @@ class PropertiesUtil {
 	/**
 	 * 根据Key读取Value
 	 * 
-	 * @param filePath 配置文件 (默认在src下)
-	 * @param key 关键字
+	 * @param filePath
+	 *            配置文件 (默认在src下)
+	 * @param key
+	 *            关键字
 	 * @return 字符串;异常时返回null.
 	 */
 	String getString(String key) {
+		key = key.toUpperCase();
 		Properties p = new Properties();
 		try {
-			InputStreamReader in = new InputStreamReader(new FileInputStream(this.filePath), "utf-8");
+			FileInputStream fis = new FileInputStream(this.filePath);
+			InputStreamReader in = new InputStreamReader(fis, "utf-8");
 			p.load(in);
 			String value = p.getProperty(key);
 			if (value != null) {
@@ -43,7 +47,7 @@ class PropertiesUtil {
 			}
 
 		} catch (IOException e) {
-			// e.printStackTrace();
+			e.printStackTrace();
 			return null;
 		}
 	}
@@ -51,11 +55,14 @@ class PropertiesUtil {
 	/**
 	 * 根据Key读取Value
 	 * 
-	 * @param filePath 配置文件 (默认在src下)
-	 * @param key 关键字
+	 * @param filePath
+	 *            配置文件 (默认在src下)
+	 * @param key
+	 *            关键字
 	 * @return Integer 整数 ;异常时返回null.
 	 */
 	Integer getInt(String key) {
+		key = key.toUpperCase();
 		Properties properties = new Properties();
 		try {
 			InputStream in = new BufferedInputStream(new FileInputStream(this.filePath));
@@ -69,6 +76,7 @@ class PropertiesUtil {
 			}
 
 		} catch (Exception e) {
+			e.printStackTrace();
 			return null;
 		}
 	}

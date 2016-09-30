@@ -21,7 +21,10 @@ public class JdbcDaoFactory {
 		return dao;
 
 	}
-
+    /**
+     * 获取默认的JdbcDao (KEY="default")
+     * @return
+     */
 	public static JdbcDao getJdbcDao() {
 
 		JdbcDao dao = daos.get(DATA.DEFAULT_KEY);

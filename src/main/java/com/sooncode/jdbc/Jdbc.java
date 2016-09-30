@@ -357,6 +357,9 @@ public class Jdbc {
 	public Object executeProcedure(String sql, Object... ins) {
 		logger.debug("【JDBC】:存储过程 SQL  " + sql);
 		Connection connection = DBs.getConnection(this.dbKey);
+		if(connection==null){
+			return null;
+		}
 		// sql 中参数的个数
 		int n = countParameter(sql, STRING.QUESTION);
 		// 创建调用存储过程的预定义SQL语句

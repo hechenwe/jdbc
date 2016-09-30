@@ -18,6 +18,7 @@ import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
 
+import com.sooncode.jdbc.constant.DATA;
 import com.sooncode.jdbc.constant.STRING;
 
 /**
@@ -73,7 +74,7 @@ public class DBs {
 			PropertiesUtil pu = new PropertiesUtil(classesPath + str);
 			DB db = new DB();
 
-			db.setKey(pu.getString("KEY"));
+			db.setKey(pu.getString("KEY") == null ? DATA.DEFAULT_KEY : pu.getString("KEY"));
 			db.setDriver(pu.getString("DRIVER"));
 			db.setIp(pu.getString("IP"));
 			db.setPort(pu.getString("PORT"));
@@ -113,7 +114,8 @@ public class DBs {
 					ds = (DataSource) pooledDataSource.invoke(null, ds, p);
 
 					dss.put(db.getKey(), ds);
-					logger.info("【JDBC】: 已添加c3p0连接池 ;数据库" + db.getDataName());
+					logger.info("【JDBC】: 已添加c3p0连接池 ;数据库" + db.getDataName()
+							+ (db.getKey().equals(DATA.DEFAULT_KEY) == true ? "（默认数据库）" : ""));
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -177,22 +179,22 @@ public class DBs {
 	/**
 	 * 关闭连接资源
 	 * 
-	 * @param objs
-	 *            含有colse()方法的对象集合
-	 * 
-	 * 
+	 * @param objs 含有colse()方法的对象集合
+	 *            
 	 */
 	public static void close(Object... objs) {
-		for (Object obj : objs) {
-			try {
-				if (obj != null) {
-					Method method = obj.getClass().getMethod("close");
-					if (method != null) {
-						method.invoke(obj);
+		if (objs != null && objs.length > 0) {
+			for (Object obj : objs) {
+				try {
+					if (obj != null) {
+						Method method = obj.getClass().getMethod("close");
+						if (method != null) {
+							method.invoke(obj);
+						}
 					}
+				} catch (Exception e) {
+					logger.info("【JDBC】: 关闭数据库资源失败 ");
 				}
-			} catch (Exception e) {
-				logger.info("【JDBC】: 关闭数据库资源失败 ");
 			}
 		}
 	}
@@ -244,21 +246,18 @@ public class DBs {
 	}
 
 	/**
-	 * 设置事务隔离级别
-	 * 
+	 * 设置事务隔离级别 * 设置事务隔离级别：</br> Connection.TRANSACTION_NONE （0）
+	 * :指示事务不受支持的常量。(注意，不能使用 ，因为它指定了不受支持的事务。) （不支持事务）
+	 * </br>Connection.TRANSACTION_READ_UNCOMMITTED （1） :指示可以发生脏读 (dirty
+	 * read)、不可重复读和虚读 (phantom read) 的常量。</br> Connection.TRANSACTION_READ_COMMITTED
+	 * （2）:指示不可以发生脏读的常量；不可重复读和虚读可以发生。 </br>Connection.TRANSACTION_REPEATABLE_READ （4）
+	 * :指示不可以发生脏读和不可重复读的常量；虚读可以发生。 (JDBC 默认值)
+	 * </br>Connection.TRANSACTION_SERIALIZABLE （8）: 指示不可以发生脏读、不可重复读和虚读的常量。
 	 * @param dbKey
 	 * @param connection
 	 */
 	private static void setTransactionIsolation(String dbKey, Connection connection) {
-		/*
-		 * 设置事务隔离级别： Connection.TRANSACTION_NONE （0） :指示事务不受支持的常量。(注意，不能使用
-		 * ，因为它指定了不受支持的事务。) （不支持事务） Connection.TRANSACTION_READ_UNCOMMITTED （1）
-		 * :指示可以发生脏读 (dirty read)、不可重复读和虚读 (phantom read) 的常量。
-		 * Connection.TRANSACTION_READ_COMMITTED （2）:指示不可以发生脏读的常量；不可重复读和虚读可以发生。
-		 * Connection.TRANSACTION_REPEATABLE_READ （4）
-		 * :指示不可以发生脏读和不可重复读的常量；虚读可以发生。 (JDBC 默认值)
-		 * Connection.TRANSACTION_SERIALIZABLE （8）: 指示不可以发生脏读、不可重复读和虚读的常量。
-		 */
+		 
 		try {
 			String ransactionIsolation = dBcache.get(dbKey).getTransactionIsolation();
 			if (ransactionIsolation != null) {
