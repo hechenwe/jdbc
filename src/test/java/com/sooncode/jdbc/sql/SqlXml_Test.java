@@ -3,10 +3,9 @@ package com.sooncode.jdbc.sql;
 import org.apache.log4j.Logger;
 import org.junit.Test;
 
-import com.sooncode.jdbc.example.entity.User;
 import com.sooncode.jdbc.sql.xml.SqlXml;
- 
 
+import example.entity.User;
 import util.PathUtil;
 
 public class SqlXml_Test {

@@ -1,4 +1,4 @@
-package com.sooncode.jdbc.example.entity;
+package example.entity;
 
 public class Teacher {
 private Integer teacherId;

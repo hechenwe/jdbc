@@ -509,7 +509,7 @@ public class Jdbc {
 		int n = 0;
 		int index = sb.indexOf(STRING.QUESTION);
 		while (index != -1) {
-			sb.replace(index, index + 1, "");
+			sb.replace(index, index + 1, STRING.NULL_STR);
 			index = sb.indexOf(STRING.QUESTION);
 			n++;
 		}
