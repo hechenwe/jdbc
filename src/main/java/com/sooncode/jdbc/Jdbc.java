@@ -1,6 +1,5 @@
 package com.sooncode.jdbc;
 
-import java.math.BigDecimal;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 

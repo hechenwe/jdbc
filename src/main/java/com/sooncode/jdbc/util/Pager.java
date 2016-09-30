@@ -190,10 +190,7 @@ public class Pager <T> {
 		this.entity = entity;
 	}
 
-	@Override
-	public String toString() {
-		return "{\"lists\":\"" + lists + "\",\"entity\":\"" + entity + "\",\"total\":\"" + total + "\",\"pageSize\":\"" + pageSize + "\",\"totalPages\":\"" + totalPages + "\",\"pageNumber\":\"" + pageNumber + "\",\"isFirstPage\":\"" + isFirstPage + "\",\"isLastPage\":\"" + isLastPage + "\",\"hasPreviousPage\":\"" + hasPreviousPage + "\",\"hasNextPage\":\"" + hasNextPage + "\"}  ";
-	}
+	 
 
  //--------------------------------------------------------------------------------------------------------------------------------
 
