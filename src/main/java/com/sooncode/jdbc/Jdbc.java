@@ -320,7 +320,7 @@ public class Jdbc {
 	}
 
 	/**
-	 * 执行查询语句 注意：防止SQL注入漏洞。
+	 * 执行查询语句
 	 * 
 	 * @param sql
 	 *            可执行文件

@@ -1,13 +1,32 @@
 <?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
 <log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
-	<appender name="Logger" class="org.apache.log4j.ConsoleAppender">
+
+
+    <!-- 日志输出到控制台 -->
+	<appender name="console" class="org.apache.log4j.ConsoleAppender">
 		<layout class="org.apache.log4j.PatternLayout">
 			<param name="ConversionPattern" value="%-5p %d{MM-dd HH:mm:ss,SSS} %m  (%F:%L) \n" />
 		</layout>
 	</appender>
-	 
+	
+	
+	<!-- 日志输出到文件 -->
+	<appender name="file"   class="org.apache.log4j.DailyRollingFileAppender"> 
+       <!--  <param name="Threshold" value="info"></param>   --> <!-- 文件日志级别 -->
+        <param name="ImmediateFlush" value="true"></param>  
+        <param name="File" value="/usr/local/var/log4j.log"></param>  <!-- 在windows系统下存放在C:/usr/local/var/logs -->
+        <param name="DatePattern" value="'.'yyyy-MM-dd'.log'"></param>  
+        <layout class="org.apache.log4j.PatternLayout">  
+            <param name="ConversionPattern" value="[%d{yyyy-MM-dd HH:mm:ss\} %-5p] [%t] {%c:%L}-%m%n"></param>  
+        </layout>  
+    </appender>   
+  
 	<root>
-		<level value="debug" />
-		<appender-ref ref="Logger" />
+		<level value="debug" /><!-- 全局日志级别 -->
+		<appender-ref ref="file" /><!-- 日志输出到文件 -->
+		<appender-ref ref="console" /><!-- 日志输出到控制台 -->
 	</root>
 </log4j:configuration>
+
+ 

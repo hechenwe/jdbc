@@ -6,6 +6,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -18,9 +19,10 @@ import org.apache.log4j.Logger;
  * 反射创建的对象
  * 
  * @author pc
+ * @param <E>
  *
  */
-public class RObject {
+public class RObject2<E> {
 	public static Logger logger = Logger.getLogger("RObject.class");
 	private static final String NULL_STR="";
 	private static final String CLASS="class ";
@@ -29,32 +31,43 @@ public class RObject {
 	private static final String UID="serialVersionUID";
 	
 	/** 被反射代理的对象 */
-	private Object object;
+	private E object;
 	 
+	public List<E> list;
 
-	public RObject(Object object) {
-		this.object = object;
+	public RObject2(E object) {
+		this.object =   object;
+		 
 	}
 
-	public RObject(Class<?> clas) {
+	public RObject2(Class<E> clas) {
+		 
+			try {
+				this.object =   clas.newInstance();
+			} catch (InstantiationException e) {
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			}
 
-		try {
-			this.object = clas.newInstance();
-			 
-		} catch (Exception e) {
+		 
+	}
 
-			e.printStackTrace();
+	@SuppressWarnings("unchecked")
+	public RObject2(String className) {
+		 
+		String EclassName = "";
+		if(EclassName.equals(className)){
+			Class<?> clas;
+			try {
+				clas =  Class.forName(className);
+				this.object = (E) clas.newInstance();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
-	}
-
-	public RObject(String className) {
-		Class<?> clas;
-		try {
-			clas = Class.forName(className);
-			this.object = clas.newInstance();
-			 
-		} catch (Exception e) {
-			e.printStackTrace();
+		else{
+			this.object = (E) new Object();
 		}
 	}
 
@@ -69,7 +82,7 @@ public class RObject {
 	}
 
 	/** 获取被反射代理的对象 */
-	public Object getObject() {
+	public E getObject() {
 		return object;
 	}
 
@@ -313,7 +326,7 @@ public class RObject {
 	 */
 	public static String toJson(Object obj) {
 
-		RObject rO = new RObject(obj);
+		RObject2 rO = new RObject2(obj);
 		Map<String, Object> map = rO.getFiledAndValue();
 
 		String json = "{";
@@ -345,6 +358,38 @@ public class RObject {
 
 	}
 
-	 
+	public String  getParameterizedType (){
+		 Field []  fs = RObject2.class.getDeclaredFields() ; // 得到所有的fields  
+		  
+		for(Field f : fs)   
+		{   
+		    Class fieldClazz = f.getType(); // 得到field的class及类型全路径  
+		  
+		    if(fieldClazz.isPrimitive())  continue;  //【1】 //判断是否为基本类型  
+		  
+		    if(fieldClazz.getName().startsWith("java.lang")) continue; //getName()返回field的类型全路径；  
+		  
+		    if(fieldClazz.isAssignableFrom(List.class)) //【2】  
+		    {   
+		             Type fc = f.getGenericType(); // 关键的地方，如果是List类型，得到其Generic的类型  
+		  
+		             if(fc == null) continue;  
+		  
+		             if(fc instanceof ParameterizedType) // 【3】如果是泛型参数的类型   
+		            {   
+		                   ParameterizedType pt = (ParameterizedType) fc;  
+		  
+		                   Class genericClazz = (Class)pt.getActualTypeArguments()[0]; //【4】 得到泛型里的class类型对象。  
+		                   System.out.println("RObject2.tt()"+genericClazz.getName());
+		                  
+		      
+		             }   
+		      }   
+		}  
+		return null;
+	}
 
+	public List<E> getoo(List<E> list){
+		return null;
+	}
 }
