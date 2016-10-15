@@ -35,8 +35,9 @@ public class RObject2<E> {
 	 
 	public List<E> list;
 
-	public RObject2(E object) {
-		this.object =   object;
+	public RObject2(Object object) {
+		 
+		this.object =   (E) object;
 		 
 	}
 

@@ -53,6 +53,14 @@ public class RObject2_Test {
 	public void getParameterizedType(){
 		RObject2<Student> r = new RObject2<Student>("com.sooncode.jdbc.reflect.modle.User");	
 		r.getParameterizedType();
+		Object o = new Object();
+		String s = "hechen";
+		o = s;
+		if(o instanceof String){
+			String ss =(String) o;
+		}
+		
+		
 	}
 	 
 }
