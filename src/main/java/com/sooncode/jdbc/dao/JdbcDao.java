@@ -1,4 +1,5 @@
 package com.sooncode.jdbc.dao;
+
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -46,7 +47,6 @@ public class JdbcDao implements JdbcDaoInterface {
 		jdbc = JdbcFactory.getJdbc(dbKey);
 	}
 
-	 
 	public Object get(Object obj) {
 		Parameter p = ComSQL.select(obj);
 		List<Map<String, Object>> list = jdbc.executeQueryL(p);
@@ -70,7 +70,8 @@ public class JdbcDao implements JdbcDaoInterface {
 		String tableName = T2E.toColumn(obj.getClass().getSimpleName());
 		String columns = ComSQL.columns(obj);
 		Parameter p = con.getWhereSql();
-		String sql = SQL_KEY.SELECT  + columns +  SQL_KEY.FROM  + tableName +  SQL_KEY.WHERE+ SQL_KEY.ONE_EQ_ONE   + p.getReadySql();
+		String sql = SQL_KEY.SELECT + columns + SQL_KEY.FROM + tableName + SQL_KEY.WHERE + SQL_KEY.ONE_EQ_ONE
+				+ p.getReadySql();
 		p.setReadySql(sql);
 		List<Map<String, Object>> list = jdbc.executeQueryL(p);
 		List<?> objects = ToEntity.findEntityObject(list, obj.getClass());
@@ -83,14 +84,14 @@ public class JdbcDao implements JdbcDaoInterface {
 		String tableName = T2E.toColumn(obj.getClass().getSimpleName());
 		String columns = ComSQL.columns(obj);
 		Parameter p = cond.getParameter();
-		String sql =  SQL_KEY.SELECT  + columns +  SQL_KEY.FROM  + tableName + SQL_KEY.WHERE  + p.getReadySql();
+		String sql = SQL_KEY.SELECT + columns + SQL_KEY.FROM + tableName + SQL_KEY.WHERE + p.getReadySql();
 		p.setReadySql(sql);
 		List<Map<String, Object>> list = jdbc.executeQueryL(p);
 		List<?> objects = ToEntity.findEntityObject(list, obj.getClass());
 		return objects;
 	}
 
-	public Pager<?> getPager(Long pageNum, Long pageSize, Object left, Object... others) {
+	public Pager<?> getPager(long pageNum, long pageSize, Object left, Object... others) {
 		RObject leftRO = new RObject(left);
 		// 1.单表
 		if (others.length == 0) {
@@ -112,7 +113,7 @@ public class JdbcDao implements JdbcDaoInterface {
 				Parameter p = ComSQL.getO2M(left, others[0], pageNum, pageSize);
 				List<Map<String, Object>> list = jdbc.executeQueryL(p);
 				Object l = ToEntity.findEntityObject(list, left.getClass());
-				List<?> res =  ToEntity.findEntityObject(list, others[0].getClass());
+				List<?> res = ToEntity.findEntityObject(list, others[0].getClass());
 				leftRO.invokeSetMethod(leftRO.getListFieldName(others[0].getClass()), res);
 				long size = getSize(left, others);
 				Pager<?> pager = new Pager<>(pageNum, pageSize, size, l);
@@ -145,14 +146,15 @@ public class JdbcDao implements JdbcDaoInterface {
 		}
 	}
 
-	public Pager<?> getPager(Long pageNum, Long pageSize, Conditions conditions) {
+	public Pager<?> getPager(long pageNum, long pageSize, Conditions conditions) {
 		String columns = ComSQL.columns(conditions.getObj());
 		Parameter where = conditions.getWhereSql();
 		String tableName = T2E.toColumn(conditions.getObj().getClass().getSimpleName());
 		Long index = (pageNum - 1) * pageSize;
-		String sql =  SQL_KEY.SELECT  + columns + SQL_KEY.FROM  + tableName +   SQL_KEY.WHERE+SQL_KEY.ONE_EQ_ONE + where.getReadySql() +  SQL_KEY.LIMIT  
-				+ index + STRING.COMMA  + pageSize;
-		String sql4size =  SQL_KEY.SELECT+SQL_KEY. COUNT + SQL_KEY. AS + SQL_KEY.SIZE+SQL_KEY. FROM  + tableName +  SQL_KEY.WHERE +SQL_KEY.ONE_EQ_ONE  + where.getReadySql();
+		String sql = SQL_KEY.SELECT + columns + SQL_KEY.FROM + tableName + SQL_KEY.WHERE + SQL_KEY.ONE_EQ_ONE
+				+ where.getReadySql() + SQL_KEY.LIMIT + index + STRING.COMMA + pageSize;
+		String sql4size = SQL_KEY.SELECT + SQL_KEY.COUNT + SQL_KEY.AS + SQL_KEY.SIZE + SQL_KEY.FROM + tableName
+				+ SQL_KEY.WHERE + SQL_KEY.ONE_EQ_ONE + where.getReadySql();
 
 		Parameter sqlP = new Parameter();
 		sqlP.setReadySql(sql);
@@ -169,9 +171,9 @@ public class JdbcDao implements JdbcDaoInterface {
 		return pager;
 	}
 
-	public Pager<?> getPager(Long pageNum, Long pageSize, Class<?> entityClass, Cond cond) {
+	public Pager<?> getPager(long pageNum, long pageSize, Class<?> entityClass, Cond cond) {
 
-		if (pageNum == null || pageSize == null || entityClass == null || cond == null || cond.isHaveCond() == false) {
+		if ( entityClass == null || cond == null || cond.isHaveCond() == false) {
 			return null;
 		}
 
@@ -180,9 +182,10 @@ public class JdbcDao implements JdbcDaoInterface {
 		Parameter where = cond.getParameter();
 		String tableName = T2E.toColumn(entityClass.getSimpleName());
 		Long index = (pageNum - 1) * pageSize;
-		String sql =  SQL_KEY.SELECT  + columns +  SQL_KEY.FROM   + tableName +  SQL_KEY. WHERE  + where.getReadySql() +  SQL_KEY. LIMIT  + index
-				+ STRING.COMMA   + pageSize;
-		String sql4size = SQL_KEY.SELECT + SQL_KEY.COUNT + SQL_KEY.AS +SQL_KEY.SIZE + SQL_KEY.FROM  + tableName +  SQL_KEY. WHERE   + where.getReadySql();
+		String sql = SQL_KEY.SELECT + columns + SQL_KEY.FROM + tableName + SQL_KEY.WHERE + where.getReadySql()
+				+ SQL_KEY.LIMIT + index + STRING.COMMA + pageSize;
+		String sql4size = SQL_KEY.SELECT + SQL_KEY.COUNT + SQL_KEY.AS + SQL_KEY.SIZE + SQL_KEY.FROM + tableName
+				+ SQL_KEY.WHERE + where.getReadySql();
 
 		Parameter sqlP = new Parameter();
 		sqlP.setReadySql(sql);
@@ -199,18 +202,18 @@ public class JdbcDao implements JdbcDaoInterface {
 		return pager;
 	}
 
-	public Long save(Object object) {
+	public long save(Object object) {
 		// 验证obj
 		if (ToEntity.isNull(object) == false) {
-			return null;
+			return 0L;
 		}
 		Parameter p = ComSQL.insert(object);
-		Long n = jdbc.executeUpdate(p);
+		long n = jdbc.executeUpdate(p);
 		return n;
 
 	}
 
-	public Boolean saves(List<?> objs) {
+	public boolean saves(List<?> objs) {
 		// 验证obj
 		if (objs == null) {
 			return false;
@@ -231,7 +234,7 @@ public class JdbcDao implements JdbcDaoInterface {
 
 	}
 
-	public Boolean saveOrUpdates(List<?> objs) {
+	public boolean saveOrUpdates(List<?> objs) {
 		List<String> sqls = new LinkedList<>();
 		String readySql = new String();
 		List<Map<Integer, Object>> parameters = new ArrayList<>();
@@ -261,7 +264,7 @@ public class JdbcDao implements JdbcDaoInterface {
 
 	}
 
-	public Long saveOrUpdate(Object obj) {
+	public long saveOrUpdate(Object obj) {
 
 		RObject rObj = new RObject(obj);
 		Object id = rObj.getPkValue();
@@ -286,31 +289,29 @@ public class JdbcDao implements JdbcDaoInterface {
 
 	}
 
-	public Long update(Object object) {
+	public long update(Object object) {
 		if (ToEntity.isNull(object) == false) {
 			return 0L;
 		}
 		Object pkValue = new RObject(object).getPkValue();
-		if(pkValue == null) {
+		if (pkValue == null) {
 			return 0L;
 		}
 		Parameter p = ComSQL.update(object);
-		Long n = jdbc.executeUpdate(p);
+		long n = jdbc.executeUpdate(p);
 		return n;
 
 	}
 
-	public Long delete(Object object) {
+	public long delete(Object object) {
 		if (ToEntity.isNull(object) == false) {
 			return 0L;
 		}
 		Parameter p = ComSQL.delete(object);
-		Long n = jdbc.executeUpdate(p)  ;
+		long n = jdbc.executeUpdate(p);
 		return n;
 
 	}
-
-	
 
 	/**
 	 * 
@@ -324,7 +325,7 @@ public class JdbcDao implements JdbcDaoInterface {
 		Parameter p = ComSQL.getO2O(left, others);
 		// logger.debug(sql);
 		List<Map<String, Object>> list = jdbc.executeQueryL(p);
-		
+
 		String TClassName = left.getClass().getName();// Genericity.getGenericity(this.getClass(),
 
 		List<Object> resultList = new LinkedList<>();
@@ -335,8 +336,8 @@ public class JdbcDao implements JdbcDaoInterface {
 			List<Field> fields = rObject.getFields();// T 对应的属性
 
 			for (Field f : fields) {
-				Object obj = m.get(T2E
-						.toField(Genericity.getSimpleName(TClassName).toUpperCase() + STRING.UNDERLINE + T2E.toColumn(f.getName())));
+				Object obj = m.get(T2E.toField(Genericity.getSimpleName(TClassName).toUpperCase() + STRING.UNDERLINE
+						+ T2E.toColumn(f.getName())));
 				if (obj != null) {
 					rObject.invokeSetMethod(f.getName(), obj);
 				}
@@ -344,7 +345,9 @@ public class JdbcDao implements JdbcDaoInterface {
 				String typeSimpleName = f.getType().getSimpleName();
 				String typeName = f.getType().getName();
 				String baseType = JavaBaseType.map.get(typeSimpleName);
-				if ( baseType==null  ) {//不包含 Integer Long Short Byte Float Double Character Boolean Date String List
+				if (baseType == null) {// 不包含 Integer Long Short Byte Float
+										// Double Character Boolean Date String
+										// List
 
 					RObject rO = new RObject(typeName);
 
@@ -352,7 +355,8 @@ public class JdbcDao implements JdbcDaoInterface {
 
 					for (Field ff : fs) {
 
-						Object o = m.get(T2E.toField(typeSimpleName.toUpperCase() + STRING.UNDERLINE + T2E.toColumn(ff.getName())));
+						Object o = m.get(T2E
+								.toField(typeSimpleName.toUpperCase() + STRING.UNDERLINE + T2E.toColumn(ff.getName())));
 						if (o != null) {
 							rO.invokeSetMethod(ff.getName(), o);
 						}
@@ -379,11 +383,11 @@ public class JdbcDao implements JdbcDaoInterface {
 	 * @param others
 	 * @return
 	 */
-	private Long getSize(Object left, Object... others) {
+	private long getSize(Object left, Object... others) {
 		Parameter p = new Parameter();
-		 
+
 		if (others.length == 0) { // 单表
-			 
+
 			p = ComSQL.selectSize(left);
 		} else
 
@@ -412,31 +416,34 @@ public class JdbcDao implements JdbcDaoInterface {
 			p = ComSQL.O2OSize(left, others);
 		}
 
-		 
 		Map<String, Object> map = jdbc.executeQueryM(p);
 		Object obj = map.get(SQL_KEY.SIZE);
-		return (Long) obj;
-
+		if (obj == null) {
+			return 0L;
+		} else {
+			return (long) obj;
+		}
 	}
-     
+
 	@Override
-	public Long update(Object oldEntityObject, Object newEnityObject) {
+	public long update(Object oldEntityObject, Object newEnityObject) {
 		Object old = this.get(oldEntityObject);
-		if(old != null){
+		if (old != null) {
 			Object key = new RObject(old).getPkValue();
 			RObject rObj = new RObject(newEnityObject);
 			rObj.setPk(key);
-			Long n = this.update(rObj.getObject());
-			if(n!=null && n ==1){
+			long n = this.update(rObj.getObject());
+			if ( n == 1) {
 				return 1L;
-			}else{
+			} else {
 				return 0L;
 			}
-		}else{
+		} else {
 			return 0L;
 		}
-		 
+
 	}
 
-	
+	 
+
 }

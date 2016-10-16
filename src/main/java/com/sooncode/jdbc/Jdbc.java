@@ -69,23 +69,23 @@ public class Jdbc {
 	 * @param sql
 	 *            可执行的更新语句
 	 * 
-	 * @return 一般情况是返回受影响的行数,当有主键为自增字段,在添加数据时返回 自增值。当执行出现异常时放回null.
+	 * @return 一般情况是返回受影响的行数,当有主键为自增字段,在添加数据时返回 自增值。当执行出现异常时返回0.
 	 */
-	public Long executeUpdate(Parameter p) {
+	public long executeUpdate(Parameter p) {
 		if (p == null) {
-			return null;
+			return 0L;
 		}
 
 		if (p.isNotException() == false) {
-			logger.debug("【JDBC】:预编译SQL和参数出现异常！");
-			return null;
+			logger.error("【JDBC】:预编译SQL和参数出现异常！");
+			return 0L;
 		}
 		String sql = p.getReadySql();
 		logger.debug("【JDBC】 预编译SQL: " + p.getFormatSql());
 		logger.debug("【JDBC】 预编译SQL对应的参数: " + p.getParams());
 		if (SqlVerification.isUpdateSql(sql) == false) {
-			logger.debug("【JDBC】SQL语句不是更新语句：" + p.getFormatSql());
-			return null;
+			logger.error("【JDBC】SQL语句不是更新语句：" + p.getFormatSql());
+			return 0L;
 		}
 
 		Connection connection = DBs.getConnection(this.dbKey);
@@ -108,8 +108,8 @@ public class Jdbc {
 				return n;
 			}
 		} catch (SQLException e) {
-			logger.debug("【JDBC】 SQL语句执行异常 : " + p.getFormatSql());
-			return null;
+			logger.error("【JDBC】 SQL语句执行异常 : " + p.getFormatSql());
+			return 0L;
 		} finally {
 			DBs.close(resultSet, preparedStatement, connection);
 		}
@@ -123,7 +123,7 @@ public class Jdbc {
 	 * 
 	 * @return 成功返回true ,失败返回 false.
 	 */
-	public Boolean executeUpdates(List<String> sqls) {
+	public boolean executeUpdates(List<String> sqls) {
 		for (String sql : sqls) {
 			if (SqlVerification.isUpdateSql(sql) == false) {
 				logger.debug("【JDBC】SQL语句不是更新语句：" + Parameter.getFormatSql(sql));
@@ -166,7 +166,7 @@ public class Jdbc {
 	 *            预编译SQL需要的参数
 	 * @return 执行成功返回true;执行失败返回false.
 	 */
-	public Boolean executeUpdate(String readySql, List<Map<Integer, Object>> parameters) {
+	public boolean executeUpdate(String readySql, List<Map<Integer, Object>> parameters) {
 		logger.debug("【JDBC】 预编译SQL:" + Parameter.getFormatSql(readySql));
 		logger.debug("【JDBC】 预编译SQL对应的参数: " + parameters);
 		if (SqlVerification.isUpdateSql(readySql) == false) {
@@ -255,20 +255,20 @@ public class Jdbc {
 	 * 执行查询语句 (只有一条返回记录)。 可防止SQL注入，推荐使用。
 	 * 
 	 * @param sql可执行SQL
-	 * @return map 记录数量不为1时返回null.
+	 * @return map 记录数量不为1时返回空Map.
 	 */
 	public Map<String, Object> executeQueryM(Parameter parameter) {
 		logger.debug("【JDBC】 预编译SQL:" + parameter.getFormatSql());
 		logger.debug("【JDBC】 预编译SQL对应的参数: " + parameter.getParams());
 		if (SqlVerification.isSelectSql(parameter.getReadySql()) == false) {
 			logger.debug("【JDBC】SQL语句不是查询语句：" + parameter.getFormatSql());
-			return null;
+			return new HashMap<>();
 		}
 		List<Map<String, Object>> list = executeQueryL(parameter);
 		if (list.size() == 1) {
 			return list.get(0);
 		} else {
-			return null;
+			return new HashMap<>();
 		}
 	}
 

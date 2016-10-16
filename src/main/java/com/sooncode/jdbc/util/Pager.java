@@ -45,16 +45,8 @@ public class Pager <T> {
 	
 	//--------------------------------------------- 构造器 ----------------------------------------------------------------
 
-	public Pager(Long pageNumber, Long pageSize, Long total, List<T> lists) {
-		if(pageNumber==null){
-			pageNumber = 1L;
-		}
-		if(pageSize==null){
-			pageNumber = 10L;
-		}
-		if(total==null){
-			pageNumber = 0L;
-		}
+	public Pager(long pageNumber, long pageSize, long total, List<T> lists) {
+		 
 		 
 		init( total ,pageNumber, pageSize);
 		if(lists==null ){
@@ -64,13 +56,13 @@ public class Pager <T> {
 		}
 	}
 	
-	public Pager(Long pageNumber, Long pageSize, Long total, T entity) {
+	public Pager(long pageNumber, long pageSize, long total, T entity) {
 		init( total ,pageNumber, pageSize);
 		this.entity = entity;
 	}
 
 	/** 设置基本参数 */
-	private void init(Long total, Long pageNumber, Long pageSize) {
+	private void init(long total, long pageNumber, long pageSize) {
 		// 设置基本参数
 		this.total = total;
 		this.pageSize = pageSize;
