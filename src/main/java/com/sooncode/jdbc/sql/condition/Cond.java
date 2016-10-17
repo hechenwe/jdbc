@@ -19,6 +19,34 @@ public class Cond {
 
 	}
 	
+	public Cond(String key,Sign equalSign,DateFormatSign dfs,String date){
+		String className = dfs.getClass().getName();
+
+		String sql = new String();
+		if (dfs.toString().contains(SQL_KEY.LIKE)) {
+			sql = T2E.toColumn(key)+ STRING.SPACING + SQL_KEY.LIKE + STRING.SPACING + STRING.QUESTION + STRING.SPACING ;   
+			if (dfs.equals(SQL_KEY.LIKE)) {
+				date = STRING.PERCENT + date +STRING.PERCENT;
+			} else if (dfs.equals(LikeSign.R_LIKE)) {
+				date = STRING.PERCENT+ date;
+			} else if (dfs.equals(LikeSign.L_LIKE)) {
+				date = date + STRING.PERCENT;
+			}
+		} else if (DateFormatSign.class.getName().equals(className)) {
+			sql = STRING.SPACING + SQL_KEY.DATE_FORMAT + SQL_KEY.L_BRACKET + T2E.toColumn(key) + STRING.COMMA + STRING.S_QUOTES  + dfs + STRING.S_QUOTES +SQL_KEY.R_BRACKET + equalSign+  STRING.QUESTION + STRING.SPACING ;//   "') = ? ";
+
+		} else {
+			sql = T2E.toColumn(key) + STRING.SPACING   + dfs + SQL_KEY.QUESTION ;  //" ? ";
+		}
+
+		Map<Integer, Object> param = new HashMap<>();
+		param.put(1, date);
+		this.parameter = new Parameter();
+		this.parameter.setReadySql(sql);
+		this.parameter.setParams(param);
+	}
+	
+	
 	
     /**
      * 创建查询条件

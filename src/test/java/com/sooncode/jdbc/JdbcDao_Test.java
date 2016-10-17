@@ -192,13 +192,13 @@ public class JdbcDao_Test {
 		
 		Cond o4 = new Or(name,id,age,pass).and(new Cond("note", LikeSign.LIKE, "haha"));
 		
-		Cond creatDate = new Cond("createDate",DateFormatSign.yyyy_MM,"2016-09");
+		Cond creatDate = new Cond("createDate",EqualSign.GT,DateFormatSign.YYYY_MM_DD("2012-09-04"));
 		 
-		Cond creatDate2 = new Cond("createDate",new DateFormatSign("%Y-%d"),"2016-25").and(new Cond("id", NullSign.IS_NOT_NULL)).orderBy(new OrderBy("id", Sort.ASC),new OrderBy("name", Sort.DESC));
+		Cond creatDate2 = new Cond("createDate",EqualSign.GT,new DateFormatSign("%Y-%d"),"2016-05").and(new Cond("id", NullSign.IS_NOT_NULL)).orderBy(new OrderBy("id", Sort.ASC),new OrderBy("name", Sort.DESC));
 		
 		Pager<?> p = jdbcDao.getPager(pagerNumber, pagerSize,User.class, creatDate2);
 		
-		logger.info(p);
+		logger.info(p.getLists());
 		
 		 
 		

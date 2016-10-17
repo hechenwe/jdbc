@@ -7,6 +7,10 @@ package com.sooncode.jdbc.sql.condition.sign;
  *
  */
 public class DateFormatSign extends Sign {
+	private String dateFormatString;
+	private String date ;
+	
+	
 	/**
 	 * 年月日, 时间格式：yyyy-MM-dd ;如 2016-09-01.
 	 */
@@ -65,6 +69,11 @@ public class DateFormatSign extends Sign {
 	 */
 	public DateFormatSign(String signStr) {
 		super(signStr);
+	}
+	
+	public static final DateFormatSign YYYY_MM_DD(String date){
+		//this.dateFormatString = "%Y-%m-%d";
+		return null;
 	}
 
 }
