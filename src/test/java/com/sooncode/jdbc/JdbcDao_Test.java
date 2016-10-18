@@ -203,4 +203,13 @@ public class JdbcDao_Test {
 		 
 		
 	}
+	
+	@Test
+	public void count(){
+		
+		User u = new User();
+		u.setAge(100);
+		long n = jdbcDao.count("*", u);
+		logger.info(n);
+	}
 }

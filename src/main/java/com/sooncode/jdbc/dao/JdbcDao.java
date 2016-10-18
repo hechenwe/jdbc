@@ -376,6 +376,21 @@ public class JdbcDao implements JdbcDaoInterface {
 		return pager;
 	}
 
+	public long count(String key,Object obj){
+		String sql = "SELECT COUNT("+key+") AS SIZE" + " FROM " + T2E.toTableName(obj.getClass().getSimpleName()) + " WHERE 1=1 " + ComSQL.where(obj).getReadySql();
+		Parameter p = new Parameter();
+		p.setReadySql(sql);
+		p.setParams(ComSQL.where(obj).getParams());
+		Map<String,Object> map  = jdbc.executeQueryM(p);
+		Long n = (Long) map.get("SIZE");
+		if(n!=null && n>0){
+			return n;
+		}else{
+			return 0L;
+		}
+	}
+	
+	
 	/**
 	 * 获取查询长度
 	 * 
