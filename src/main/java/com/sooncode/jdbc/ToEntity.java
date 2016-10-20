@@ -26,31 +26,12 @@ public class ToEntity {
 			return new LinkedList<>();
 		}
 		List<Object> objects = new LinkedList<>();
-		String tableName = T2E.toColumn(clas.getSimpleName());
 		for (Map<String, Object> map : list) {
-			RObject rObj = new RObject(clas);
-			Field[] fields = clas.getDeclaredFields();
-			for (Field field : fields) {
-				String fieldName = field.getName();
-				String columnName = T2E.toColumn(field.getName());
-				String key = tableName + STRING.UNDERLINE + columnName;
-
-				Object value = map.get(key);
-				if (value == null) {
-					value = map.get(columnName);
-					if (value == null) {
-						continue;
-					}
-				}
-				rObj.invokeSetMethod(fieldName, value);
-			}
-
-			Object object = rObj.getObject();
+			Object object = toEntityObject(map, clas);
 			if (objects.size() >= 1 && object.toString().equals(objects.get(objects.size() - 1).toString())) {
 				continue;
 			}
 			objects.add(object);
-
 		}
 		return objects;
 	}
