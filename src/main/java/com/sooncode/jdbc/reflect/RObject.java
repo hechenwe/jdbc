@@ -224,9 +224,10 @@ public class RObject {
 		 
 		List<Field> fields = this.getFields();
 		for (Field field : fields) {
+			String name = field.getName().replace("$cglib_prop_", "");
 			// logger.debug(field.getName());
 			if (!field.getName().equals(UID) && str.contains(field.getType().getSimpleName())) {
-				map.put(field.getName(), this.invokeGetMethod(field.getName()));
+				map.put(name, this.invokeGetMethod(name));
 			}
 		}
 		return map;

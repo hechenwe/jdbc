@@ -177,6 +177,40 @@ public class ComSQL {
 		p.setParams(paramet);
 		return p;
 	}
+	/**
+	 * 获取查询语句的可执行SQL (单表)
+	 * 
+	 * @param object
+	 * @return 可执行SQL
+	 */
+	public static Parameter select(String tableName, Object object) {
+		//String tableName = T2E.toColumn(object.getClass().getSimpleName());
+		Map<String, Object> map = new RObject(object).getFiledAndValue();
+		int m = 0;
+		String s = SQL_KEY.ONE_EQ_ONE;
+		String c = new String();
+		Map<Integer,Object> paramet = new HashMap<>();
+		Integer index = 1;
+		for (Entry<String, Object> entry : map.entrySet()) {
+			String key = entry.getKey().replace("$cglib_prop_", "");
+			if (entry.getValue() != null) {
+				s = s +SQL_KEY.AND;
+				s = s + tableName+STRING.POINT+ T2E.toColumn(key) +SQL_KEY.EQ +STRING.QUESTION;
+				paramet.put(index,entry.getValue());
+				index++;
+			}
+			if (m != 0) {
+				c = c + SQL_KEY.COMMA;
+			}
+			c = c + tableName+STRING.POINT+T2E.toColumn(key) + SQL_KEY.AS +   tableName+STRING.UNDERLINE+T2E.toColumn(key);
+			m++;
+		}
+		String sql = SQL_KEY.SELECT  + c  + SQL_KEY.FROM + tableName + SQL_KEY.WHERE + s;
+		Parameter p = new Parameter();
+		p.setReadySql(sql);
+		p.setParams(paramet);
+		return p;
+	}
 	 
 	
 	/**

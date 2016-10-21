@@ -1,20 +1,26 @@
 package com.sooncode.jdbc.dao;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
+import org.apache.log4j.chainsaw.Main;
 
 import com.sooncode.jdbc.Jdbc;
 import com.sooncode.jdbc.JdbcFactory;
 import com.sooncode.jdbc.ToEntity;
+import com.sooncode.jdbc.cglib.Cglib;
 import com.sooncode.jdbc.constant.JavaBaseType;
 import com.sooncode.jdbc.constant.SQL_KEY;
 import com.sooncode.jdbc.constant.STRING;
+import com.sooncode.jdbc.json.SoonJson;
 import com.sooncode.jdbc.reflect.Genericity;
 import com.sooncode.jdbc.reflect.RObject;
 import com.sooncode.jdbc.sql.ComSQL;
@@ -23,6 +29,8 @@ import com.sooncode.jdbc.sql.condition.Cond;
 import com.sooncode.jdbc.sql.condition.Conditions;
 import com.sooncode.jdbc.util.Pager;
 import com.sooncode.jdbc.util.T2E;
+import com.sooncode.jdbc.util.create_entity.Column;
+import com.sooncode.jdbc.util.create_entity.TableBuilder;
 
 /**
  * Jdbc Dao 服务
@@ -173,7 +181,7 @@ public class JdbcDao implements JdbcDaoInterface {
 
 	public Pager<?> getPager(long pageNum, long pageSize, Class<?> entityClass, Cond cond) {
 
-		if ( entityClass == null || cond == null || cond.isHaveCond() == false) {
+		if (entityClass == null || cond == null || cond.isHaveCond() == false) {
 			return null;
 		}
 
@@ -376,21 +384,21 @@ public class JdbcDao implements JdbcDaoInterface {
 		return pager;
 	}
 
-	public long count(String key,Object obj){
-		String sql = "SELECT COUNT("+key+") AS SIZE" + " FROM " + T2E.toTableName(obj.getClass().getSimpleName()) + " WHERE 1=1 " + ComSQL.where(obj).getReadySql();
+	public long count(String key, Object obj) {
+		String sql = "SELECT COUNT(" + key + ") AS SIZE" + " FROM " + T2E.toTableName(obj.getClass().getSimpleName())
+				+ " WHERE 1=1 " + ComSQL.where(obj).getReadySql();
 		Parameter p = new Parameter();
 		p.setReadySql(sql);
 		p.setParams(ComSQL.where(obj).getParams());
-		Map<String,Object> map  = jdbc.executeQueryM(p);
+		Map<String, Object> map = jdbc.executeQueryM(p);
 		Long n = (Long) map.get("SIZE");
-		if(n!=null && n>0){
+		if (n != null && n > 0) {
 			return n;
-		}else{
+		} else {
 			return 0L;
 		}
 	}
-	
-	
+
 	/**
 	 * 获取查询长度
 	 * 
@@ -448,7 +456,7 @@ public class JdbcDao implements JdbcDaoInterface {
 			RObject rObj = new RObject(newEnityObject);
 			rObj.setPk(key);
 			long n = this.update(rObj.getObject());
-			if ( n == 1) {
+			if (n == 1) {
 				return 1L;
 			} else {
 				return 0L;
@@ -459,6 +467,53 @@ public class JdbcDao implements JdbcDaoInterface {
 
 	}
 
+	@SuppressWarnings("unchecked")
+	public String get4json(String json) {
+		Map<String, Object> map = SoonJson.getMap(json);
+		String key = new String();
+		Object val = new String();
+		for (Entry<String, Object> en : map.entrySet()) {
+			key = en.getKey();
+			val = en.getValue();
+			break;
+		}
+
+		Map<String, Object> proMap = SoonJson.getMap(val.toString());
+		
+		String tableName = T2E.toTableName(key);
+
+		TableBuilder tb = new TableBuilder("127.0.0.1", "3306", "root", "hechenwe@gmail.com", "jdbc");
+		Map<String, Column> columns = tb.getColumns(tableName);
+		HashMap<String, Class<?>> propertyMap = new HashMap<>();
+		for (Entry<String, Column> en : columns.entrySet()) {
+			Column c = en.getValue();
+			String propertyName =T2E.toField(  en.getKey());
+			try {
+				propertyMap.put(propertyName, Class.forName("java.lang."+c.getJavaDataType()));
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}
+		}
+		// 生成动态 Bean
+		Cglib bean = new Cglib(propertyMap);
+		for (Entry<String, Object> en : proMap.entrySet()) {
+		bean.setValue(en.getKey(), en.getValue());
+		}
+		// 获得bean的实体
+		Object object = bean.getObject();
+
+		 
+
+	    Parameter  p = 	ComSQL.select(tableName, object);
+		 
+		List<Map<String,Object>> list =   jdbc.executeQueryL(p) ;
+		 
+		String str = 	 SoonJson.getJsonArray(list);
+		 
+		
+		return str;
+	}
+	
 	 
 
 }

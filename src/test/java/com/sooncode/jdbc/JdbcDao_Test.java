@@ -212,4 +212,11 @@ public class JdbcDao_Test {
 		long n = jdbcDao.count("*", u);
 		logger.info(n);
 	}
+	@Test 
+	public void get4json (){
+		String json = "{\"teacher\":{\"teacherName\":\"hechen\"}}";
+		
+		String rJson = jdbcDao.get4json(json);
+		logger.info(rJson);
+	}
 }
